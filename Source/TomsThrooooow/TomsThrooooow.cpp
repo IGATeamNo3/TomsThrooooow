@@ -2,6 +2,7 @@
 
 #include "TomsThrooooow.h"
 
+DEFINE_LOG_CATEGORY(LogTomThrow);
 
 IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, TomsThrooooow, "TomsThrooooow" );
  
