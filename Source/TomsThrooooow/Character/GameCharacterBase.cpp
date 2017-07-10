@@ -2,6 +2,7 @@
 
 #include "TomsThrooooow.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Item/ThrowableActor.h"
 #include "GameCharacterBase.h"
 
 
@@ -109,9 +110,8 @@ void AGameCharacterBase::PickOrThrow()
 	// if PickedActor not exists, then try pick up something
 	else
 	{
-		// TODO:Should use unified base class, like ThrowableActor
 		TArray<AActor*> Overlaps;
-		PickCheckCapsule->GetOverlappingActors(Overlaps, AActor::StaticClass());
+		PickCheckCapsule->GetOverlappingActors(Overlaps, AThrowableActor::StaticClass());
 		for (int32 i = 0; i < Overlaps.Num(); i++)
 		{
 			if (Overlaps[i] && !Overlaps[i]->IsPendingKill())
