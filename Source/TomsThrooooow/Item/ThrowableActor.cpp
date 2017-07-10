@@ -20,6 +20,9 @@ AThrowableActor::AThrowableActor(const class FObjectInitializer& ObjectInitializ
 
 	RootComponent = StaticMeshComponent;
 
+	// set replicate
+	SetReplicates(true);
+	bReplicateMovement = true;
 }
 
 // Called when the game starts or when spawned

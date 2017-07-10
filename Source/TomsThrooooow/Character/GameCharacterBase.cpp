@@ -74,6 +74,12 @@ void AGameCharacterBase::LookUp(float Value)
 
 void AGameCharacterBase::PickOrThrow()
 {
+	if (Role < ROLE_Authority)
+	{
+		ServerPickOrThrow();
+		return;
+	}
+
 	// if PickedActor exists, then throw it
 	if (PickedActor)
 	{
@@ -129,5 +135,15 @@ void AGameCharacterBase::PickOrThrow()
 			}
 		}
 	}
+}
+
+void AGameCharacterBase::ServerPickOrThrow_Implementation()
+{
+	PickOrThrow();
+}
+
+bool AGameCharacterBase::ServerPickOrThrow_Validate()
+{
+	return true;
 }
 

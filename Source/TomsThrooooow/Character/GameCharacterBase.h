@@ -42,4 +42,8 @@ private:
 
 	/** Called for pick or throw input */
 	void PickOrThrow();
+	UFUNCTION(Server, Reliable, WithValidation)
+	void ServerPickOrThrow();
+	void ServerPickOrThrow_Implementation();
+	bool ServerPickOrThrow_Validate();
 };
