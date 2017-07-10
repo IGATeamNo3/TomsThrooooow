@@ -30,7 +30,7 @@ protected:
 
 	/************************************************************************/
 	/* Throw                                                                */
-	UPROPERTY(VisibleAnywhere, Category = "Throw")
+	UPROPERTY(EditAnywhere, Category = "Throw")
 	float ThrowStrength;
 	/************************************************************************/
 private:
