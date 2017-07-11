@@ -74,12 +74,30 @@ void AGameCharacterBase::LookUp(float Value)
 
 void AGameCharacterBase::PickOrThrow()
 {
+	float MoveRightInputAxisValue = GetInputAxisValue("MoveRight");
+	float LookUpInputAxisValue = GetInputAxisValue("LookUp");
+
 	if (Role < ROLE_Authority)
 	{
-		ServerPickOrThrow();
+		ServerPickOrThrow(MoveRightInputAxisValue, LookUpInputAxisValue);
 		return;
 	}
 
+	PickOrThrowWithInput(MoveRightInputAxisValue, LookUpInputAxisValue);
+}
+
+void AGameCharacterBase::ServerPickOrThrow_Implementation(float RightInput, float UpInput)
+{
+	PickOrThrowWithInput(RightInput, UpInput);
+}
+
+bool AGameCharacterBase::ServerPickOrThrow_Validate(float RightInput, float UpInput)
+{
+	return true;
+}
+
+void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
+{
 	// if PickedActor exists, then throw it
 	if (PickedActor)
 	{
@@ -89,19 +107,16 @@ void AGameCharacterBase::PickOrThrow()
 			// Detach to PickRoot
 			PickedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 
-			float MoveRightInputAxisValue = GetInputAxisValue("MoveRight");
-			float LookUpInputAxisValue = GetInputAxisValue("LookUp");
-
 			// without input throw
 			FVector ThrowVector;
-			if (MoveRightInputAxisValue == .0f && LookUpInputAxisValue == .0f)
+			if (RightInput == .0f && UpInput == .0f)
 			{
 				ThrowVector = GetArrowComponent()->GetForwardVector() * ThrowStrength;
 			}
 			// with input throw
 			else
 			{
-				float InputDegree = UKismetMathLibrary::DegAtan2(LookUpInputAxisValue, MoveRightInputAxisValue);
+				float InputDegree = UKismetMathLibrary::DegAtan2(UpInput, RightInput);
 				FRotator InputRotator = UKismetMathLibrary::MakeRotator(InputDegree, 0.f, 0.f);
 				ThrowVector = UKismetMathLibrary::GreaterGreater_VectorRotator(FVector(0.f, -1.f, 0.f), InputRotator) * ThrowStrength;
 			}
@@ -133,15 +148,5 @@ void AGameCharacterBase::PickOrThrow()
 			}
 		}
 	}
-}
-
-void AGameCharacterBase::ServerPickOrThrow_Implementation()
-{
-	PickOrThrow();
-}
-
-bool AGameCharacterBase::ServerPickOrThrow_Validate()
-{
-	return true;
 }
 
