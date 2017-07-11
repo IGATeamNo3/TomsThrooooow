@@ -12,11 +12,16 @@ AThrowableActor::AThrowableActor(const class FObjectInitializer& ObjectInitializ
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
-	StaticMeshComponent->SetCollisionProfileName(UCollisionProfile::PhysicsActor_ProfileName);
+	StaticMeshComponent->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
 	StaticMeshComponent->Mobility = EComponentMobility::Movable;
-	StaticMeshComponent->BodyInstance.bSimulatePhysics = true;
-	StaticMeshComponent->BodyInstance.bNotifyRigidBodyCollision = true;
 	StaticMeshComponent->bGenerateOverlapEvents = true;
+
+	ProjectileMovementTemplate = NewObject<UProjectileMovementComponent>(this, TEXT("ProjectileMovementTemplate"), 
+		RF_ArchetypeObject | RF_Public | RF_Transactional);
+	ProjectileMovementTemplate->bAutoRegister = false;
+	ProjectileMovementTemplate->bAutoActivate = false;
+	ProjectileMovementTemplate->bShouldBounce = true;
+	ProjectileMovementTemplate->bInitialVelocityInLocalSpace = false;
 
 	RootComponent = StaticMeshComponent;
 
@@ -37,5 +42,28 @@ void AThrowableActor::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
+}
+
+void AThrowableActor::OnPick()
+{
+	if (ProjectileMovement)
+	{
+		ProjectileMovement->Deactivate();
+		ProjectileMovement->DestroyComponent();
+		ProjectileMovement = NULL;
+	}
+}
+
+void AThrowableActor::OnThrow(const FVector& ThrowVelocity)
+{
+	if (!ProjectileMovement)
+	{
+		ProjectileMovement = Cast<UProjectileMovementComponent>(
+			CreateComponentFromTemplate(ProjectileMovementTemplate, FName(TEXT("ProjectileMovement"))));
+		ProjectileMovement->OnComponentCreated();
+		ProjectileMovement->bAutoActivate = true;
+		ProjectileMovement->Velocity = ThrowVelocity;
+		ProjectileMovement->RegisterComponent();
+	}
 }
 

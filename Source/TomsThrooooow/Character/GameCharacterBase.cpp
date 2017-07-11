@@ -83,12 +83,11 @@ void AGameCharacterBase::PickOrThrow()
 	// if PickedActor exists, then throw it
 	if (PickedActor)
 	{
-		UPrimitiveComponent* PickedActorPrimitiveComponent = Cast<UPrimitiveComponent>(PickedActor->GetRootComponent());
-		if (PickedActorPrimitiveComponent)
+		AThrowableActor* ThrowableActor = Cast<AThrowableActor>(PickedActor);
+		if (ThrowableActor)
 		{
 			// Detach to PickRoot
 			PickedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-			PickedActorPrimitiveComponent->SetSimulatePhysics(true);
 
 			float MoveRightInputAxisValue = GetInputAxisValue("MoveRight");
 			float LookUpInputAxisValue = GetInputAxisValue("LookUp");
@@ -107,8 +106,7 @@ void AGameCharacterBase::PickOrThrow()
 				ThrowVector = UKismetMathLibrary::GreaterGreater_VectorRotator(FVector(0.f, -1.f, 0.f), InputRotator) * ThrowStrength;
 			}
 
-			PickedActorPrimitiveComponent->SetPhysicsLinearVelocity(ThrowVector, true);
-			
+			ThrowableActor->OnThrow(ThrowVector);
 		}
 
 		PickedActor = NULL;
@@ -124,12 +122,12 @@ void AGameCharacterBase::PickOrThrow()
 			{
 				PickedActor = Overlaps[i];
 
-				UPrimitiveComponent* PickedActorPrimitiveComponent = Cast<UPrimitiveComponent>(PickedActor->GetRootComponent());
-				if (PickedActorPrimitiveComponent)
+				AThrowableActor* ThrowableActor = Cast<AThrowableActor>(PickedActor);
+				if (ThrowableActor)
 				{
 					// Attach to PickRoot
-					PickedActorPrimitiveComponent->SetSimulatePhysics(false);
-					PickedActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+					ThrowableActor->OnPick();
+					ThrowableActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 					break;
 				}
 			}
