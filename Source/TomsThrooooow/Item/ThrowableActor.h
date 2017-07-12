@@ -26,6 +26,9 @@ public:
 	virtual void OnThrow(const FVector& ThrowVelocity);
 	/** Implement IThrowableInterface end*/
 
+	UFUNCTION()
+	virtual void OnCollisionHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit);
+
 protected:
 	UPROPERTY(Category = ThrowableActor, VisibleAnywhere, BlueprintReadOnly, meta = (ExposeFunctionCategories = "Mesh,Rendering,Physics,Components|StaticMesh", AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* StaticMeshComponent;

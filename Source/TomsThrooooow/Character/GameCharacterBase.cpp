@@ -48,11 +48,18 @@ AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectIni
 	ThrowStrength = 1000.f;
 }
 
+void AGameCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGameCharacterBase, bIsStunning);
+}
+
 // Called to bind functionality to input
 void AGameCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// set up gameplay key bindings
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGameCharacterBase::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("PickOrThrow", IE_Pressed, this, &AGameCharacterBase::PickOrThrow);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGameCharacterBase::MoveRight);
@@ -61,10 +68,21 @@ void AGameCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
 
+void AGameCharacterBase::Jump()
+{
+	if (!bIsStunning)
+	{
+		Super::Jump();
+	}
+}
+
 void AGameCharacterBase::MoveRight(float Value)
 {
-	// add movement in that direction
-	AddMovementInput(FVector(0.f, -1.f, 0.f), Value);
+	if (!bIsStunning)
+	{
+		// add movement in that direction
+		AddMovementInput(FVector(0.f, -1.f, 0.f), Value);
+	}
 }
 
 void AGameCharacterBase::LookUp(float Value)
@@ -74,20 +92,24 @@ void AGameCharacterBase::LookUp(float Value)
 
 void AGameCharacterBase::PickOrThrow()
 {
-	float MoveRightInputAxisValue = GetInputAxisValue("MoveRight");
-	float LookUpInputAxisValue = GetInputAxisValue("LookUp");
-
-	if (Role < ROLE_Authority)
+	if (!bIsStunning)
 	{
-		ServerPickOrThrow(MoveRightInputAxisValue, LookUpInputAxisValue);
-		return;
-	}
+		float MoveRightInputAxisValue = GetInputAxisValue("MoveRight");
+		float LookUpInputAxisValue = GetInputAxisValue("LookUp");
 
-	PickOrThrowWithInput(MoveRightInputAxisValue, LookUpInputAxisValue);
+		if (Role < ROLE_Authority)
+		{
+			ServerPickOrThrow(MoveRightInputAxisValue, LookUpInputAxisValue);
+			return;
+		}
+
+		PickOrThrowWithInput(MoveRightInputAxisValue, LookUpInputAxisValue);
+	}
 }
 
 void AGameCharacterBase::ServerPickOrThrow_Implementation(float RightInput, float UpInput)
 {
+
 	PickOrThrowWithInput(RightInput, UpInput);
 }
 
@@ -148,5 +170,17 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 			}
 		}
 	}
+}
+
+void AGameCharacterBase::SetStun()
+{
+	bIsStunning = true;
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_Stun);
+	GetWorldTimerManager().SetTimer(TimerHandle_Stun, this, &AGameCharacterBase::SetUnstun, 5.f);
+}
+void AGameCharacterBase::SetUnstun()
+{
+	bIsStunning = false;
 }
 

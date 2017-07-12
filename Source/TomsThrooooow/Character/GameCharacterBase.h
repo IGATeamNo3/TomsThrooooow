@@ -16,6 +16,7 @@ protected:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	virtual void Jump() override;
 
 	/************************************************************************/
 	/* Pick                                                                 */
@@ -48,4 +49,14 @@ private:
 	void ServerPickOrThrow_Implementation(float RightInput, float UpInput);
 	bool ServerPickOrThrow_Validate(float RightInput, float UpInput);
 	void PickOrThrowWithInput(float RightInput, float UpInput);
+
+public:
+	// Set the Character state to stun
+	void SetStun();
+	void SetUnstun();
+private:
+	UPROPERTY(Transient, Replicated)
+	bool bIsStunning;
+	/* Timer handle to manage stun time */
+	FTimerHandle TimerHandle_Stun;
 };

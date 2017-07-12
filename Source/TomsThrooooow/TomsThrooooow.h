@@ -4,6 +4,7 @@
 #define __TOMSTHROOOOOW_H__
 
 #include "Engine.h"
+#include "Net/UnrealNetwork.h"
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTomThrow, Verbose, All);
 

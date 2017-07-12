@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TomsThrooooow.h"
+#include "Character/GameCharacterBase.h"
 #include "ThrowableActor.h"
 
 
@@ -24,6 +25,9 @@ AThrowableActor::AThrowableActor(const class FObjectInitializer& ObjectInitializ
 	ProjectileMovementTemplate->bInitialVelocityInLocalSpace = false;
 
 	RootComponent = StaticMeshComponent;
+
+	// set event callback
+	OnActorHit.AddDynamic(this, &AThrowableActor::OnCollisionHit);
 
 	// set replicate
 	SetReplicates(true);
@@ -64,6 +68,16 @@ void AThrowableActor::OnThrow(const FVector& ThrowVelocity)
 		ProjectileMovement->bAutoActivate = true;
 		ProjectileMovement->Velocity = ThrowVelocity;
 		ProjectileMovement->RegisterComponent();
+	}
+}
+
+void AThrowableActor::OnCollisionHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
+{
+	AGameCharacterBase* OtherCharacter = Cast<AGameCharacterBase>(OtherActor);
+	// if hit is a character
+	if (OtherCharacter)
+	{
+		OtherCharacter->SetStun();
 	}
 }
 
