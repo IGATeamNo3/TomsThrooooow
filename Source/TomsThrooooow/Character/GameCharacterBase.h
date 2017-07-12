@@ -3,10 +3,11 @@
 #pragma once
 
 #include "GameFramework/Character.h"
+#include "Item/ThrowableInterface.h"
 #include "GameCharacterBase.generated.h"
 
 UCLASS(abstract, config = Game)
-class TOMSTHROOOOOW_API AGameCharacterBase : public ACharacter
+class TOMSTHROOOOOW_API AGameCharacterBase : public ACharacter , public IThrowableInterface
 {
 	GENERATED_BODY()
 
@@ -37,10 +38,8 @@ protected:
 private:
 	/** Called for side to side input */
 	void MoveRight(float Val);
-
 	/** Called for look up input */
 	void LookUp(float Val);
-
 	/** Called for pick or throw input */
 	void PickOrThrow();
 
@@ -49,6 +48,11 @@ private:
 	void ServerPickOrThrow_Implementation(float RightInput, float UpInput);
 	bool ServerPickOrThrow_Validate(float RightInput, float UpInput);
 	void PickOrThrowWithInput(float RightInput, float UpInput);
+
+	/** Implement IThrowableInterface start*/
+	virtual void OnPick();
+	virtual void OnThrow(const FVector& ThrowVelocity);
+	/** Implement IThrowableInterface end*/
 
 public:
 	// Set the Character state to stun

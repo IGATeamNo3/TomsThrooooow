@@ -27,6 +27,7 @@ AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectIni
 	GetCharacterMovement()->GroundFriction = 3.f;
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
+	GetCharacterMovement()->bEnablePhysicsInteraction = false;
 
 	// Configure PickCheckCapsule
 	PickCheckCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("PickCheckCapsule"));
@@ -36,7 +37,6 @@ AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectIni
 	PickCheckCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
 	PickCheckCapsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 	PickCheckCapsule->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
-	PickCheckCapsule->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Overlap);
 	PickCheckCapsule->SetupAttachment(GetCapsuleComponent());
 
 	// Configure PickRoot
@@ -123,7 +123,7 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 	// if PickedActor exists, then throw it
 	if (PickedActor)
 	{
-		AThrowableActor* ThrowableActor = Cast<AThrowableActor>(PickedActor);
+		IThrowableInterface* ThrowableActor = Cast<IThrowableInterface>(PickedActor);
 		if (ThrowableActor)
 		{
 			// Detach to PickRoot
@@ -151,25 +151,61 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 	// if PickedActor not exists, then try pick up something
 	else
 	{
-		TArray<AActor*> Overlaps;
-		PickCheckCapsule->GetOverlappingActors(Overlaps, AThrowableActor::StaticClass());
-		for (int32 i = 0; i < Overlaps.Num(); i++)
+		// check for character pick
 		{
-			if (Overlaps[i] && !Overlaps[i]->IsPendingKill())
+			TArray<AActor*> Overlaps;
+			PickCheckCapsule->GetOverlappingActors(Overlaps, AGameCharacterBase::StaticClass());
+			for (int32 i = 0; i < Overlaps.Num(); i++)
 			{
-				PickedActor = Overlaps[i];
-
-				AThrowableActor* ThrowableActor = Cast<AThrowableActor>(PickedActor);
-				if (ThrowableActor)
+				if (Overlaps[i] && !Overlaps[i]->IsPendingKill())
 				{
-					// Attach to PickRoot
-					ThrowableActor->OnPick();
-					ThrowableActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-					break;
+					PickedActor = Overlaps[i];
+
+					AGameCharacterBase* ThrowableActor = Cast<AGameCharacterBase>(PickedActor);
+					if (ThrowableActor)
+					{
+						// Attach to PickRoot
+						ThrowableActor->OnPick();
+						ThrowableActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+						return;
+					}
+				}
+			}
+		}
+
+		// check for throwable actor pick
+		{
+			TArray<AActor*> Overlaps;
+			PickCheckCapsule->GetOverlappingActors(Overlaps, AThrowableActor::StaticClass());
+			for (int32 i = 0; i < Overlaps.Num(); i++)
+			{
+				if (Overlaps[i] && !Overlaps[i]->IsPendingKill())
+				{
+					PickedActor = Overlaps[i];
+
+					AThrowableActor* ThrowableActor = Cast<AThrowableActor>(PickedActor);
+					if (ThrowableActor)
+					{
+						// Attach to PickRoot
+						ThrowableActor->OnPick();
+						ThrowableActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+						return;
+					}
 				}
 			}
 		}
 	}
+}
+
+void AGameCharacterBase::OnPick()
+{
+	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+	GetCapsuleComponent()->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+}
+void AGameCharacterBase::OnThrow(const FVector& ThrowVelocity)
+{
+	LaunchCharacter(ThrowVelocity, false, false);
+	GetCapsuleComponent()->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 }
 
 void AGameCharacterBase::SetStun()
