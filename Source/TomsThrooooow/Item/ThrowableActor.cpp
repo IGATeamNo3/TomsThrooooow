@@ -78,6 +78,9 @@ void AThrowableActor::OnCollisionHit(AActor* SelfActor, AActor* OtherActor, FVec
 	if (OtherCharacter)
 	{
 		OtherCharacter->SetStun();
+
+		FVector SelfVelocity = GetVelocity();
+		OtherCharacter->LaunchCharacter(SelfVelocity, false, false);
 	}
 }
 
