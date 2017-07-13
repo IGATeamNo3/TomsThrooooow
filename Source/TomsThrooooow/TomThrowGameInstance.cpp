@@ -2,7 +2,6 @@
 
 #include "TomsThrooooow.h"
 #include "OnlineSubsystem.h"
-#include "OnlineSessionInterface.h"
 #include "OnlineSessionSettings.h"
 #include "TomThrowGameInstance.h"
 
@@ -37,7 +36,6 @@ void UTomThrowGameInstance::FindSessionsWithSetting(APlayerController* PC, int32
 	SearchObject->MaxSearchResults = MaxResults;
 	SearchObject->bIsLanQuery = bUseLAN;
 	SearchObject->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
-
 	OSSPtr->GetSessionInterface()->FindSessions(*UserID, SearchObject.ToSharedRef());
 }
 
@@ -60,4 +58,19 @@ TSharedPtr<const FUniqueNetId> UTomThrowGameInstance::GetPlayerUniqueID(APlayerC
 		//FFrame::KismetExecutionMessage(*FString::Printf(TEXT("%s - Invalid player state"), FunctionContext), ELogVerbosity::Warning);
 	}
 	return UserID;
+}
+
+void UTomThrowGameInstance::HandleCreateSessionComplete(FName InSessionName, bool bSuccess)
+{
+
+}
+
+void UTomThrowGameInstance::HandleFindSessionsComplete(bool bSuccess)
+{
+
+}
+
+void UTomThrowGameInstance::HandleJoinSessionComplete(FName InSessionName, EOnJoinSessionCompleteResult::Type ResultType)
+{
+
 }

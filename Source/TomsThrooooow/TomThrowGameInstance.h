@@ -3,6 +3,7 @@
 #pragma once
 
 #include "Engine/GameInstance.h"
+#include "OnlineSessionInterface.h"
 #include "TomThrowGameInstance.generated.h"
 
 /**
@@ -25,4 +26,13 @@ public:
 	//UFUNCTION(BlueprintPure, Category = Sessions)
 protected:
 	TSharedPtr<const FUniqueNetId> GetPlayerUniqueID(APlayerController* PlayerController);
+
+	void HandleCreateSessionComplete(FName SessionName, bool bSuccess);
+
+	void HandleFindSessionsComplete(bool bSuccess);
+
+	void HandleJoinSessionComplete(FName SessionName, EOnJoinSessionCompleteResult::Type ResultType);
+
+private:
+	void InitSessionSystem();
 };
