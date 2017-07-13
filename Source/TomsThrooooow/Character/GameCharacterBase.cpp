@@ -36,7 +36,7 @@ AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectIni
 	PickCheckCapsule->SetCapsuleRadius(35, false);
 	PickCheckCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
 	PickCheckCapsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	PickCheckCapsule->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
+	PickCheckCapsule->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Overlap);
 	PickCheckCapsule->SetupAttachment(GetCapsuleComponent());
 
 	// Configure PickRoot

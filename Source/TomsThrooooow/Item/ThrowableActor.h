@@ -15,12 +15,6 @@ public:
 	// Sets default values for this actor's properties
 	AThrowableActor(const class FObjectInitializer& ObjectInitializer);
 
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-	
-	// Called every frame
-	virtual void Tick( float DeltaSeconds ) override;
-
 	/** Implement IThrowableInterface start*/
 	virtual void OnPick();
 	virtual void OnThrow(const FVector& ThrowVelocity);
@@ -32,9 +26,4 @@ public:
 protected:
 	UPROPERTY(Category = ThrowableActor, VisibleAnywhere, BlueprintReadOnly, meta = (ExposeFunctionCategories = "Mesh,Rendering,Physics,Components|StaticMesh", AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* StaticMeshComponent;
-
-	UPROPERTY(Category = ThrowableActor, VisibleAnywhere, BlueprintReadOnly)
-	class UProjectileMovementComponent* ProjectileMovementTemplate;
-
-	class UProjectileMovementComponent* ProjectileMovement;
 };

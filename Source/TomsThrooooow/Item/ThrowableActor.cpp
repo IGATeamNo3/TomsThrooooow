@@ -13,16 +13,12 @@ AThrowableActor::AThrowableActor(const class FObjectInitializer& ObjectInitializ
 	PrimaryActorTick.bCanEverTick = true;
 
 	StaticMeshComponent = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("StaticMeshComponent"));
-	StaticMeshComponent->SetCollisionProfileName(UCollisionProfile::BlockAllDynamic_ProfileName);
+	StaticMeshComponent->SetCollisionProfileName(UCollisionProfile::PhysicsActor_ProfileName);
 	StaticMeshComponent->Mobility = EComponentMobility::Movable;
+	StaticMeshComponent->BodyInstance.bSimulatePhysics = true;
+	StaticMeshComponent->BodyInstance.bNotifyRigidBodyCollision = true;
+	StaticMeshComponent->BodyInstance.bLockXTranslation = true;
 	StaticMeshComponent->bGenerateOverlapEvents = true;
-
-	ProjectileMovementTemplate = NewObject<UProjectileMovementComponent>(this, TEXT("ProjectileMovementTemplate"), 
-		RF_ArchetypeObject | RF_Public | RF_Transactional);
-	ProjectileMovementTemplate->bAutoRegister = false;
-	ProjectileMovementTemplate->bAutoActivate = false;
-	ProjectileMovementTemplate->bShouldBounce = true;
-	ProjectileMovementTemplate->bInitialVelocityInLocalSpace = false;
 
 	RootComponent = StaticMeshComponent;
 
@@ -34,41 +30,15 @@ AThrowableActor::AThrowableActor(const class FObjectInitializer& ObjectInitializ
 	bReplicateMovement = true;
 }
 
-// Called when the game starts or when spawned
-void AThrowableActor::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AThrowableActor::Tick( float DeltaTime )
-{
-	Super::Tick( DeltaTime );
-
-}
-
 void AThrowableActor::OnPick()
 {
-	if (ProjectileMovement)
-	{
-		ProjectileMovement->Deactivate();
-		ProjectileMovement->DestroyComponent();
-		ProjectileMovement = NULL;
-	}
+	StaticMeshComponent->SetSimulatePhysics(false);
 }
 
 void AThrowableActor::OnThrow(const FVector& ThrowVelocity)
 {
-	if (!ProjectileMovement)
-	{
-		ProjectileMovement = Cast<UProjectileMovementComponent>(
-			CreateComponentFromTemplate(ProjectileMovementTemplate, FName(TEXT("ProjectileMovement"))));
-		ProjectileMovement->OnComponentCreated();
-		ProjectileMovement->bAutoActivate = true;
-		ProjectileMovement->Velocity = ThrowVelocity;
-		ProjectileMovement->RegisterComponent();
-	}
+	StaticMeshComponent->SetSimulatePhysics(true);
+	StaticMeshComponent->SetPhysicsLinearVelocity(ThrowVelocity, true);
 }
 
 void AThrowableActor::OnCollisionHit(AActor* SelfActor, AActor* OtherActor, FVector NormalImpulse, const FHitResult& Hit)
@@ -77,7 +47,7 @@ void AThrowableActor::OnCollisionHit(AActor* SelfActor, AActor* OtherActor, FVec
 	// if hit is a character
 	if (OtherCharacter)
 	{
-		OtherCharacter->SetStun();
+		//OtherCharacter->SetStun();
 
 		FVector SelfVelocity = GetVelocity();
 		OtherCharacter->LaunchCharacter(SelfVelocity, false, false);
