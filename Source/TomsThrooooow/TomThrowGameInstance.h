@@ -9,10 +9,24 @@
 /**
  * 
  */
+UENUM(BlueprintType)
+enum class ECompeleteResult : uint8
+{
+	EC_Success,
+	EC_Failure
+};
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCreateSession, ECompeleteResult, Result);
+
 UCLASS()
 class TOMSTHROOOOOW_API UTomThrowGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = Sessions)
+		FOnCreateSession OnCreateComplete;
 public:
 
 	virtual void Init()override;
@@ -35,4 +49,16 @@ protected:
 
 private:
 	void InitSessionSystem();
+	void OnCreateCompleted(FName SessionName, bool bSuccess);
+	void OnStartCompleted(FName SessionName, bool bSuccess);
+private:
+	// The delegate executed by the online subsystem
+	FOnCreateSessionCompleteDelegate CreateCompleteDelegate;
+
+	// The delegate executed by the online subsystem
+	FOnStartSessionCompleteDelegate StartCompleteDelegate;
+
+	FDelegateHandle CreateCompleteDelegateHandle;
+	FDelegateHandle StartCompleteDelegateHandle;
 };
+

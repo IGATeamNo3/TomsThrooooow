@@ -11,32 +11,40 @@ const FName SessionName(TEXT("Game"));
 void UTomThrowGameInstance::Init()
 {
 	Super::Init();
+	InitSessionSystem();
 }
 
 void UTomThrowGameInstance::CreateSessionWithSetting(APlayerController* PC,  bool bUseLAN)
 {
 	IOnlineSubsystem* OSSPtr = IOnlineSubsystem::Get();
 	
-	FOnlineSessionSettings Settings;
-	
-	Settings.bIsLANMatch = bUseLAN;
-	
-	TSharedPtr<const FUniqueNetId> UserID = GetPlayerUniqueID(PC);
-	
-	OSSPtr->GetSessionInterface()->CreateSession(*UserID, SessionName, Settings);
-	
+	if (OSSPtr)
+	{
+		FOnlineSessionSettings Settings;
+
+		Settings.bIsLANMatch = bUseLAN;
+
+		TSharedPtr<const FUniqueNetId> UserID = GetPlayerUniqueID(PC);
+
+		CreateCompleteDelegateHandle = OSSPtr->GetSessionInterface()->AddOnCreateSessionCompleteDelegate_Handle(CreateCompleteDelegate);
+		OSSPtr->GetSessionInterface()->CreateSession(*UserID, SessionName, Settings);
+	}	
 }
 
 void UTomThrowGameInstance::FindSessionsWithSetting(APlayerController* PC, int32 MaxResults,  bool bUseLAN)
 {
 	IOnlineSubsystem* OSSPtr = IOnlineSubsystem::Get();
-	TSharedPtr<const FUniqueNetId> UserID = GetPlayerUniqueID(PC);
+	if (OSSPtr)
+	{
+		TSharedPtr<const FUniqueNetId> UserID = GetPlayerUniqueID(PC);
 
-	TSharedPtr<FOnlineSessionSearch> SearchObject = MakeShareable(new FOnlineSessionSearch);
-	SearchObject->MaxSearchResults = MaxResults;
-	SearchObject->bIsLanQuery = bUseLAN;
-	SearchObject->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
-	OSSPtr->GetSessionInterface()->FindSessions(*UserID, SearchObject.ToSharedRef());
+		TSharedPtr<FOnlineSessionSearch> SearchObject = MakeShareable(new FOnlineSessionSearch);
+		SearchObject->MaxSearchResults = MaxResults;
+		SearchObject->bIsLanQuery = bUseLAN;
+		SearchObject->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals);
+		OSSPtr->GetSessionInterface()->FindSessions(*UserID, SearchObject.ToSharedRef());
+	}
+	
 }
 
 TSharedPtr<const FUniqueNetId> UTomThrowGameInstance::GetPlayerUniqueID(APlayerController* PlayerController)
@@ -72,5 +80,52 @@ void UTomThrowGameInstance::HandleFindSessionsComplete(bool bSuccess)
 
 void UTomThrowGameInstance::HandleJoinSessionComplete(FName InSessionName, EOnJoinSessionCompleteResult::Type ResultType)
 {
+
+}
+
+void UTomThrowGameInstance::InitSessionSystem()
+{
+	CreateCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateCompleted);
+	StartCompleteDelegate = FOnStartSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnStartCompleted);
+}
+
+void UTomThrowGameInstance::OnCreateCompleted(FName InSessionName, bool bSuccess)
+{
+	IOnlineSubsystem* Sessions = IOnlineSubsystem::Get();
+
+	if (Sessions)
+	{
+		Sessions->GetSessionInterface()->ClearOnCreateSessionCompleteDelegate_Handle(CreateCompleteDelegateHandle);
+		if (bSuccess)
+		{
+			StartCompleteDelegateHandle = Sessions->GetSessionInterface()->AddOnStartSessionCompleteDelegate_Handle(StartCompleteDelegate);
+			Sessions->GetSessionInterface()->StartSession(InSessionName);
+			return;
+		}
+	}
+	if (!bSuccess)
+	{
+		OnCreateComplete.Broadcast(ECompeleteResult::EC_Failure);
+		UE_LOG(LogTomThrow, Error, TEXT("CreateSessionFaild"));
+	}
+}
+
+void UTomThrowGameInstance::OnStartCompleted(FName InSessionName, bool bSuccess)
+{
+	IOnlineSubsystem* Sessions = IOnlineSubsystem::Get();
+
+	if (Sessions)
+	{
+		Sessions->GetSessionInterface()->ClearOnStartSessionCompleteDelegate_Handle(StartCompleteDelegateHandle);
+		if (bSuccess)
+		{
+			OnCreateComplete.Broadcast(ECompeleteResult::EC_Success);
+		}
+	}
+	
+	if (!bSuccess)
+	{
+		OnCreateComplete.Broadcast(ECompeleteResult::EC_Failure);
+	}
 
 }

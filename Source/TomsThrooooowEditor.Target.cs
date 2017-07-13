@@ -8,6 +8,7 @@ public class TomsThrooooowEditorTarget : TargetRules
 	public TomsThrooooowEditorTarget(TargetInfo Target)
 	{
 		Type = TargetType.Editor;
+        bUsesSteam = true;
 	}
 
 	//

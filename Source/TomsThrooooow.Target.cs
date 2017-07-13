@@ -8,6 +8,7 @@ public class TomsThrooooowTarget : TargetRules
 	public TomsThrooooowTarget(TargetInfo Target)
 	{
 		Type = TargetType.Game;
+        bUsesSteam = true;
 	}
 
 	//
