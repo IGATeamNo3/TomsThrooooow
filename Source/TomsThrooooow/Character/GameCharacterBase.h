@@ -12,37 +12,30 @@ class TOMSTHROOOOOW_API AGameCharacterBase : public ACharacter , public IThrowab
 	GENERATED_BODY()
 
 protected:
-	// Sets default values for this character's properties
 	AGameCharacterBase(const class FObjectInitializer& ObjectInitializer);
 
-	// Called to bind functionality to input
+	/************************************************************************/
+	/* Input Bind                                                           */
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	virtual void Jump() override;
+	void MoveRight(float Val);
+	void LookUp(float Val);
+	void PickOrThrow();
+	/************************************************************************/
 
 	/************************************************************************/
-	/* Pick                                                                 */
-	UPROPERTY(VisibleAnywhere, Category = "Pick")
+	/* Pick And Throw                                                       */
+	AActor* PickedActor;
+
+	UPROPERTY(VisibleAnywhere, Category = "PickAndThrow")
 	UCapsuleComponent* PickCheckCapsule;
 
-	UPROPERTY(VisibleAnywhere, Category = "Pick")
-	USceneComponent* PickRoot;
-
-	AActor* PickedActor;
-	/************************************************************************/
-
-	/************************************************************************/
-	/* Throw                                                                */
-	UPROPERTY(EditAnywhere, Category = "Throw")
+	UPROPERTY(VisibleAnywhere, Category = "PickAndThrow")
+	USceneComponent* PickRoot;	
+	
+	UPROPERTY(EditAnywhere, Category = "PickAndThrow")
 	float ThrowStrength;
-	/************************************************************************/
 private:
-	/** Called for side to side input */
-	void MoveRight(float Val);
-	/** Called for look up input */
-	void LookUp(float Val);
-	/** Called for pick or throw input */
-	void PickOrThrow();
-
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerPickOrThrow(float RightInput,float UpInput);
 	void ServerPickOrThrow_Implementation(float RightInput, float UpInput);
@@ -53,7 +46,10 @@ private:
 	virtual void OnPick();
 	virtual void OnThrow(const FVector& ThrowVelocity);
 	/** Implement IThrowableInterface end*/
+	/************************************************************************/
 
+	/************************************************************************/
+	/* Stun                                                                 */
 public:
 	// Set the Character state to stun
 	void SetStun();
@@ -63,4 +59,5 @@ private:
 	bool bIsStunning;
 	/* Timer handle to manage stun time */
 	FTimerHandle TimerHandle_Stun;
+	/************************************************************************/
 };

@@ -2,7 +2,6 @@
 
 #include "TomsThrooooow.h"
 #include "TomsThrooooowGameMode.h"
-#include "TomsThrooooowCharacter.h"
 
 ATomsThrooooowGameMode::ATomsThrooooowGameMode()
 {
