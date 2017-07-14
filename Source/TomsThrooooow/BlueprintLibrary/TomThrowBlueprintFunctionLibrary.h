@@ -20,5 +20,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "TomThrow | Library")
 		static bool IsDevelopMode();
 	
+	UFUNCTION(BlueprintPure, meta = (WorldContext = "WorldContextObject"), Category = "TomThrow | Library")
+		static class UTomsSessions* GetTomsSession(UObject* WorldContextObject);
+
 	
 };

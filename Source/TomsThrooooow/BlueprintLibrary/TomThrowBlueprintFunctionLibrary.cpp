@@ -1,6 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TomsThrooooow.h"
+#include "TomThrowGameInstance.h"
 #include "TomThrowBlueprintFunctionLibrary.h"
 
 
@@ -42,4 +43,20 @@ void UTomThrowBlueprintFunctionLibrary::TravelLevel(UObject* WorldContextObject,
 bool UTomThrowBlueprintFunctionLibrary::IsDevelopMode()
 {
 	return !(IsRunningGame() || IsRunningDedicatedServer());
+}
+
+UTomsSessions* UTomThrowBlueprintFunctionLibrary::GetTomsSession(UObject* WorldContextObject)
+{
+	UWorld* World = WorldContextObject->GetWorld();
+	if (World)
+	{
+		UTomThrowGameInstance* GameInstance = Cast<UTomThrowGameInstance>(World->GetGameInstance());
+		if (GameInstance)
+		{
+			return GameInstance->GetTomsSession();
+		}
+	}
+	
+	return nullptr;
+
 }
