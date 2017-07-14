@@ -27,6 +27,9 @@ protected:
 	/* Pick And Throw                                                       */
 	AActor* PickedActor;
 
+	UPROPERTY(Transient, Replicated)
+	bool bIsPickedByOthers;
+
 	UPROPERTY(VisibleAnywhere, Category = "PickAndThrow")
 	UCapsuleComponent* PickCheckCapsule;
 

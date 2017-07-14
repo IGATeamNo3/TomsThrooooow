@@ -6,7 +6,6 @@
 #include "GameCharacterBase.h"
 
 
-// Sets default values
 AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
@@ -53,9 +52,9 @@ void AGameCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AGameCharacterBase, bIsStunning);
+	DOREPLIFETIME(AGameCharacterBase, bIsPickedByOthers);
 }
 
-// Called to bind functionality to input
 void AGameCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// set up gameplay key bindings
@@ -67,32 +66,28 @@ void AGameCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
-
 void AGameCharacterBase::Jump()
 {
-	if (!bIsStunning)
+	if (!bIsStunning && !bIsPickedByOthers)
 	{
 		Super::Jump();
 	}
 }
-
 void AGameCharacterBase::MoveRight(float Value)
 {
-	if (!bIsStunning)
+	if (!bIsStunning && !bIsPickedByOthers)
 	{
 		// add movement in that direction
 		AddMovementInput(FVector(0.f, -1.f, 0.f), Value);
 	}
 }
-
 void AGameCharacterBase::LookUp(float Value)
 {
 	//do nothing now
 }
-
 void AGameCharacterBase::PickOrThrow()
 {
-	if (!bIsStunning)
+	if (!bIsStunning && !bIsPickedByOthers)
 	{
 		float MoveRightInputAxisValue = GetInputAxisValue("MoveRight");
 		float LookUpInputAxisValue = GetInputAxisValue("LookUp");
@@ -109,15 +104,12 @@ void AGameCharacterBase::PickOrThrow()
 
 void AGameCharacterBase::ServerPickOrThrow_Implementation(float RightInput, float UpInput)
 {
-
 	PickOrThrowWithInput(RightInput, UpInput);
 }
-
 bool AGameCharacterBase::ServerPickOrThrow_Validate(float RightInput, float UpInput)
 {
 	return true;
 }
-
 void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 {
 	// if PickedActor exists, then throw it
@@ -162,7 +154,7 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 					PickedActor = Overlaps[i];
 
 					AGameCharacterBase* ThrowableActor = Cast<AGameCharacterBase>(PickedActor);
-					if (ThrowableActor)
+					if (ThrowableActor /*&& ThrowableActor->bIsStunning*/)
 					{
 						// Attach to PickRoot
 						ThrowableActor->OnPick();
@@ -199,11 +191,15 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 
 void AGameCharacterBase::OnPick()
 {
+	bIsPickedByOthers = true;
+
 	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 	GetCapsuleComponent()->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
 }
 void AGameCharacterBase::OnThrow(const FVector& ThrowVelocity)
 {
+	bIsPickedByOthers = false;
+
 	LaunchCharacter(ThrowVelocity, false, false);
 	GetCapsuleComponent()->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 }

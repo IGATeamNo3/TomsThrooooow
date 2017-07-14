@@ -47,10 +47,19 @@ void AThrowableActor::OnCollisionHit(AActor* SelfActor, AActor* OtherActor, FVec
 	// if hit is a character
 	if (OtherCharacter)
 	{
-		//OtherCharacter->SetStun();
-
 		FVector SelfVelocity = GetVelocity();
-		OtherCharacter->LaunchCharacter(SelfVelocity, false, false);
+		//UE_LOG(LogTomThrow, Verbose, TEXT("SelfVelocity:(%f,%f,%f)"), SelfVelocity.X, SelfVelocity.Y, SelfVelocity.Z);
+
+		if (SelfVelocity.Size() > 200)
+		{
+			OtherCharacter->SetStun();
+		}
+
+		//FVector SelfVelocity = GetVelocity();
+		//OtherCharacter->GetCharacterMovement()->AddImpulse(SelfVelocity * -1,true);
+		
+		//OtherCharacter->GetCharacterMovement()->AddImpulse(NormalImpulse, false);
+		//UE_LOG(LogTomThrow, Verbose, TEXT("NormalImpulse:(%f,%f,%f)"), NormalImpulse.X, NormalImpulse.Y, NormalImpulse.Z);
 	}
 }
 
