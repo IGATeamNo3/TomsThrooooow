@@ -30,6 +30,8 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnFindSession, ECompeleteResult, R
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnJoinSession, ECompeleteResult, Result);
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDestroySession, ECompeleteResult, Result);
+
 UCLASS(BlueprintType)
 class TOMSTHROOOOOW_API UTomsSessions : public UObject
 {
@@ -45,6 +47,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = Sessions)
 		FOnJoinSession OnJoinComplete;
+
+	UPROPERTY(BlueprintAssignable, Category = Sessions)
+		FOnDestroySession OnDestroyComplete;
 public:
 
 
@@ -57,7 +62,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = Sessions)
 		void JoinSessionWithSetting(APlayerController* PC, const FTomsBlueprintSessionResult& Session);
-
+	UFUNCTION(BlueprintCallable, Category = Sessions)
+		void DestroyTomsSession(APlayerController* PC);
+	
 	UFUNCTION(BlueprintPure, Category = Sessions)
 	static FString GetServerName(const FTomsBlueprintSessionResult& Result)
 	{
