@@ -58,7 +58,13 @@ public:
 	void SetStun();
 	void SetUnstun();
 private:
-	UPROPERTY(Transient, Replicated)
+	UPROPERTY(VisibleAnywhere, Category = "PickAndThrow")
+	UParticleSystemComponent* StunEffect;
+
+	UFUNCTION()
+	virtual void OnRep_SetStunning();
+
+	UPROPERTY(Transient, ReplicatedUsing=OnRep_SetStunning)
 	bool bIsStunning;
 	/* Timer handle to manage stun time */
 	FTimerHandle TimerHandle_Stun;

@@ -43,6 +43,11 @@ AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectIni
 	PickRoot->SetRelativeLocation(FVector(0, 0, 180));
 	PickRoot->SetupAttachment(GetCapsuleComponent());
 
+	// Configure StunEffect
+	StunEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("StunEffect"));
+	StunEffect->bHiddenInGame = true;
+	StunEffect->SetupAttachment(GetCapsuleComponent());
+
 	// Property Initialize
 	ThrowStrength = 1000.f;
 }
@@ -207,6 +212,7 @@ void AGameCharacterBase::OnThrow(const FVector& ThrowVelocity)
 void AGameCharacterBase::SetStun()
 {
 	bIsStunning = true;
+	OnRep_SetStunning();
 
 	GetWorldTimerManager().ClearTimer(TimerHandle_Stun);
 	GetWorldTimerManager().SetTimer(TimerHandle_Stun, this, &AGameCharacterBase::SetUnstun, 5.f);
@@ -214,5 +220,10 @@ void AGameCharacterBase::SetStun()
 void AGameCharacterBase::SetUnstun()
 {
 	bIsStunning = false;
+	OnRep_SetStunning();
+}
+void AGameCharacterBase::OnRep_SetStunning()
+{
+	StunEffect->SetHiddenInGame(!bIsStunning);
 }
 
