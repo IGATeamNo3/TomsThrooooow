@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "SpeechRecognizer.h"
 #include "FlytekVoiceSDK.h"
+#include "SpeechRecognizer.h"
 #include "ScopeLock.h"
 #include "SpeechRecognizeTask.h"
 
