@@ -9,7 +9,7 @@
 
 //const FName TomsSessionName(TEXT("TomsThrowSession"));
 //const FName TomsSessionName(TEXT("Game"));
-
+//Mark GetNamedSession
 UTomsSessions::UTomsSessions()
 {
 	UE_LOG(LogTomThrow, Warning, TEXT("New TomsSession "))
