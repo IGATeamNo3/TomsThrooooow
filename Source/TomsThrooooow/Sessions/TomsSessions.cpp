@@ -8,7 +8,7 @@
 
 
 //const FName TomsSessionName(TEXT("TomsThrowSession"));
-const FName TomsSessionName(TEXT("Game"));
+//const FName TomsSessionName(TEXT("Game"));
 
 UTomsSessions::UTomsSessions()
 {
@@ -22,7 +22,7 @@ UTomsSessions::~UTomsSessions()
 	if (Sessions)
 	{
 		DestroyCompleteDelegateHandle = Sessions->GetSessionInterface()->AddOnDestroySessionCompleteDelegate_Handle(DestroyCompleteDelegate);
-		Sessions->GetSessionInterface()->DestroySession(TomsSessionName);
+		Sessions->GetSessionInterface()->DestroySession(GameSessionName);
 	}
 }
 
@@ -44,7 +44,7 @@ void UTomsSessions::CreateSessionWithSetting(APlayerController* PC, bool bUseLAN
 			Settings.bIsLANMatch = bUseLAN;
 
 			CreateCompleteDelegateHandle = Sessions->AddOnCreateSessionCompleteDelegate_Handle(CreateCompleteDelegate);
-			Sessions->CreateSession(*UserID, TomsSessionName, Settings);
+			Sessions->CreateSession(*UserID, GameSessionName, Settings);
 		}
 	
 	}
@@ -82,7 +82,7 @@ void UTomsSessions::JoinSessionWithSetting(APlayerController* PC, const FTomsBlu
 		if (Sessions.IsValid() && UserID.IsValid())
 		{
 			JoinCompleteDelegateHandle = Sessions->AddOnJoinSessionCompleteDelegate_Handle(JoinCompleteDelegate);
-			Sessions->JoinSession(*UserID, TomsSessionName, Session.OnlineResult);
+			Sessions->JoinSession(*UserID, GameSessionName, Session.OnlineResult);
 		}
 	}
 }
@@ -97,7 +97,7 @@ void UTomsSessions::DestroyTomsSession(APlayerController* PC)
 		if (Sessions.IsValid() && UserID.IsValid())
 		{
 			DestroyCompleteDelegateHandle = Sessions->AddOnDestroySessionCompleteDelegate_Handle(DestroyCompleteDelegate);
-			Sessions->DestroySession(TomsSessionName);
+			Sessions->DestroySession(GameSessionName);
 		}
 	}
 }
@@ -218,7 +218,7 @@ void UTomsSessions::OnJoinCompleted(FName InSessionName, EOnJoinSessionCompleteR
 		{
 			Sessions->ClearOnJoinSessionCompleteDelegate_Handle(JoinCompleteDelegateHandle);
 			FString ConnectString;
-			if (Sessions->GetResolvedConnectString(TomsSessionName, ConnectString))
+			if (Sessions->GetResolvedConnectString(GameSessionName, ConnectString))
 			{
 				UE_LOG(LogTomThrow, Log, TEXT("Join Session: Traveling to %s"), *ConnectString)
 					OnJoinComplete.Broadcast(ECompeleteResult::EC_Success);
