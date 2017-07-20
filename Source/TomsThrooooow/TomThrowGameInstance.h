@@ -3,26 +3,26 @@
 #pragma once
 
 #include "Engine/GameInstance.h"
+#include "OnlineSessionInterface.h"
 #include "TomThrowGameInstance.generated.h"
 
 /**
  * 
  */
+
+
 UCLASS()
 class TOMSTHROOOOOW_API UTomThrowGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
+
+	virtual void Init() override;
 public:
-
-	virtual void Init()override;
-	
-	UFUNCTION(BlueprintCallable, Category = Sessions)
-	void CreateSessionWithSetting(APlayerController* PC, bool bUseLAN);
-
-	UFUNCTION(BlueprintCallable, Category = Sessions)
-	void FindSessionsWithSetting(APlayerController* PC, int32 MaxResults, bool bUseLAN);
-	
-	//UFUNCTION(BlueprintPure, Category = Sessions)
+	UFUNCTION(BlueprintPure, Category = Sessions)
+		UTomsSessions* GetTomsSession() const { return TomsSession; }
 protected:
-	TSharedPtr<const FUniqueNetId> GetPlayerUniqueID(APlayerController* PlayerController);
+	UPROPERTY()
+	class UTomsSessions* TomsSession;
+
 };
+
