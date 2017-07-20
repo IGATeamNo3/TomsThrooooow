@@ -6,7 +6,6 @@
 #include "GameCharacterBase.h"
 
 
-// Sets default values
 AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
@@ -27,6 +26,7 @@ AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectIni
 	GetCharacterMovement()->GroundFriction = 3.f;
 	GetCharacterMovement()->MaxWalkSpeed = 600.f;
 	GetCharacterMovement()->MaxFlySpeed = 600.f;
+	GetCharacterMovement()->bEnablePhysicsInteraction = false;
 
 	// Configure PickCheckCapsule
 	PickCheckCapsule = CreateDefaultSubobject<UCapsuleComponent>(TEXT("PickCheckCapsule"));
@@ -35,7 +35,6 @@ AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectIni
 	PickCheckCapsule->SetCapsuleRadius(35, false);
 	PickCheckCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
 	PickCheckCapsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
-	PickCheckCapsule->SetCollisionResponseToChannel(ECC_WorldDynamic, ECR_Overlap);
 	PickCheckCapsule->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Overlap);
 	PickCheckCapsule->SetupAttachment(GetCapsuleComponent());
 
@@ -44,15 +43,27 @@ AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectIni
 	PickRoot->SetRelativeLocation(FVector(0, 0, 180));
 	PickRoot->SetupAttachment(GetCapsuleComponent());
 
+	// Configure StunEffect
+	StunEffect = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("StunEffect"));
+	StunEffect->bHiddenInGame = true;
+	StunEffect->SetupAttachment(GetCapsuleComponent());
+
 	// Property Initialize
 	ThrowStrength = 1000.f;
 }
 
-// Called to bind functionality to input
+void AGameCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AGameCharacterBase, bIsStunning);
+	DOREPLIFETIME(AGameCharacterBase, bIsPickedByOthers);
+}
+
 void AGameCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	// set up gameplay key bindings
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ACharacter::Jump);
+	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGameCharacterBase::Jump);
 	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
 	PlayerInputComponent->BindAction("PickOrThrow", IE_Pressed, this, &AGameCharacterBase::PickOrThrow);
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGameCharacterBase::MoveRight);
@@ -60,55 +71,76 @@ void AGameCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputC
 
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
-
+void AGameCharacterBase::Jump()
+{
+	if (!bIsStunning && !bIsPickedByOthers)
+	{
+		Super::Jump();
+	}
+}
 void AGameCharacterBase::MoveRight(float Value)
 {
-	// add movement in that direction
-	AddMovementInput(FVector(0.f, -1.f, 0.f), Value);
+	if (!bIsStunning && !bIsPickedByOthers)
+	{
+		// add movement in that direction
+		AddMovementInput(FVector(0.f, -1.f, 0.f), Value);
+	}
 }
-
 void AGameCharacterBase::LookUp(float Value)
 {
 	//do nothing now
 }
-
 void AGameCharacterBase::PickOrThrow()
 {
-	if (Role < ROLE_Authority)
+	if (!bIsStunning && !bIsPickedByOthers)
 	{
-		ServerPickOrThrow();
-		return;
-	}
+		float MoveRightInputAxisValue = GetInputAxisValue("MoveRight");
+		float LookUpInputAxisValue = GetInputAxisValue("LookUp");
 
+		if (Role < ROLE_Authority)
+		{
+			ServerPickOrThrow(MoveRightInputAxisValue, LookUpInputAxisValue);
+			return;
+		}
+
+		PickOrThrowWithInput(MoveRightInputAxisValue, LookUpInputAxisValue);
+	}
+}
+
+void AGameCharacterBase::ServerPickOrThrow_Implementation(float RightInput, float UpInput)
+{
+	PickOrThrowWithInput(RightInput, UpInput);
+}
+bool AGameCharacterBase::ServerPickOrThrow_Validate(float RightInput, float UpInput)
+{
+	return true;
+}
+void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
+{
 	// if PickedActor exists, then throw it
 	if (PickedActor)
 	{
-		UPrimitiveComponent* PickedActorPrimitiveComponent = Cast<UPrimitiveComponent>(PickedActor->GetRootComponent());
-		if (PickedActorPrimitiveComponent)
+		IThrowableInterface* ThrowableActor = Cast<IThrowableInterface>(PickedActor);
+		if (ThrowableActor)
 		{
 			// Detach to PickRoot
 			PickedActor->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-			PickedActorPrimitiveComponent->SetSimulatePhysics(true);
-
-			float MoveRightInputAxisValue = GetInputAxisValue("MoveRight");
-			float LookUpInputAxisValue = GetInputAxisValue("LookUp");
 
 			// without input throw
 			FVector ThrowVector;
-			if (MoveRightInputAxisValue == .0f && LookUpInputAxisValue == .0f)
+			if (RightInput == .0f && UpInput == .0f)
 			{
 				ThrowVector = GetArrowComponent()->GetForwardVector() * ThrowStrength;
 			}
 			// with input throw
 			else
 			{
-				float InputDegree = UKismetMathLibrary::DegAtan2(LookUpInputAxisValue, MoveRightInputAxisValue);
+				float InputDegree = UKismetMathLibrary::DegAtan2(UpInput, RightInput);
 				FRotator InputRotator = UKismetMathLibrary::MakeRotator(InputDegree, 0.f, 0.f);
 				ThrowVector = UKismetMathLibrary::GreaterGreater_VectorRotator(FVector(0.f, -1.f, 0.f), InputRotator) * ThrowStrength;
 			}
 
-			PickedActorPrimitiveComponent->SetPhysicsLinearVelocity(ThrowVector, true);
-			
+			ThrowableActor->OnThrow(ThrowVector);
 		}
 
 		PickedActor = NULL;
@@ -116,34 +148,82 @@ void AGameCharacterBase::PickOrThrow()
 	// if PickedActor not exists, then try pick up something
 	else
 	{
-		TArray<AActor*> Overlaps;
-		PickCheckCapsule->GetOverlappingActors(Overlaps, AThrowableActor::StaticClass());
-		for (int32 i = 0; i < Overlaps.Num(); i++)
+		// check for character pick
 		{
-			if (Overlaps[i] && !Overlaps[i]->IsPendingKill())
+			TArray<AActor*> Overlaps;
+			PickCheckCapsule->GetOverlappingActors(Overlaps, AGameCharacterBase::StaticClass());
+			for (int32 i = 0; i < Overlaps.Num(); i++)
 			{
-				PickedActor = Overlaps[i];
-
-				UPrimitiveComponent* PickedActorPrimitiveComponent = Cast<UPrimitiveComponent>(PickedActor->GetRootComponent());
-				if (PickedActorPrimitiveComponent)
+				if (Overlaps[i] && !Overlaps[i]->IsPendingKill())
 				{
-					// Attach to PickRoot
-					PickedActorPrimitiveComponent->SetSimulatePhysics(false);
-					PickedActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
-					break;
+					PickedActor = Overlaps[i];
+
+					AGameCharacterBase* ThrowableActor = Cast<AGameCharacterBase>(PickedActor);
+					if (ThrowableActor /*&& ThrowableActor->bIsStunning*/)
+					{
+						// Attach to PickRoot
+						ThrowableActor->OnPick();
+						ThrowableActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+						return;
+					}
+				}
+			}
+		}
+
+		// check for throwable actor pick
+		{
+			TArray<AActor*> Overlaps;
+			PickCheckCapsule->GetOverlappingActors(Overlaps, AThrowableActor::StaticClass());
+			for (int32 i = 0; i < Overlaps.Num(); i++)
+			{
+				if (Overlaps[i] && !Overlaps[i]->IsPendingKill())
+				{
+					PickedActor = Overlaps[i];
+
+					AThrowableActor* ThrowableActor = Cast<AThrowableActor>(PickedActor);
+					if (ThrowableActor)
+					{
+						// Attach to PickRoot
+						ThrowableActor->OnPick();
+						ThrowableActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+						return;
+					}
 				}
 			}
 		}
 	}
 }
 
-void AGameCharacterBase::ServerPickOrThrow_Implementation()
+void AGameCharacterBase::OnPick()
 {
-	PickOrThrow();
+	bIsPickedByOthers = true;
+
+	GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+	GetCapsuleComponent()->SetCollisionProfileName(UCollisionProfile::NoCollision_ProfileName);
+}
+void AGameCharacterBase::OnThrow(const FVector& ThrowVelocity)
+{
+	bIsPickedByOthers = false;
+
+	LaunchCharacter(ThrowVelocity, false, false);
+	GetCapsuleComponent()->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 }
 
-bool AGameCharacterBase::ServerPickOrThrow_Validate()
+void AGameCharacterBase::SetStun()
 {
-	return true;
+	bIsStunning = true;
+	OnRep_SetStunning();
+
+	GetWorldTimerManager().ClearTimer(TimerHandle_Stun);
+	GetWorldTimerManager().SetTimer(TimerHandle_Stun, this, &AGameCharacterBase::SetUnstun, 5.f);
+}
+void AGameCharacterBase::SetUnstun()
+{
+	bIsStunning = false;
+	OnRep_SetStunning();
+}
+void AGameCharacterBase::OnRep_SetStunning()
+{
+	StunEffect->SetHiddenInGame(!bIsStunning);
 }
 

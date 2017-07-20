@@ -16,11 +16,15 @@
 	],
 	"Plugins": [
 		{
+<<<<<<< HEAD
 			"Name": "OnlineSubsystemSteam",
 			"Enabled": true
 		},
 		{
 			"Name": "HyperealVR",
+=======
+			"Name": "FlytekVoiceSDK",
+>>>>>>> master
 			"Enabled": true
 		}
 	]
