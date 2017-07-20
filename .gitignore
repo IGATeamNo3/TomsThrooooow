@@ -112,3 +112,16 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+*.response
+Plugins/FlytekVoiceSDK/Intermediate/Build/Win64/UE4Editor/Development/FlytekVoiceSDK/Module.FlytekVoiceSDK.cpp
+Plugins/FlytekVoiceSDK/Intermediate/Build/Win64/UE4Editor/Development/FlytekVoiceSDK/ModuleVersionResource.rc.inl.res
+Plugins/FlytekVoiceSDK/Intermediate/Build/Win64/UE4Editor/Development/FlytekVoiceSDK/PCLaunch.rc.res
+Plugins/FlytekVoiceSDK/Intermediate/Build/Win64/UE4Editor/Inc/FlytekVoiceSDK/FlytekVoiceSDK.generated.cpp
+Plugins/FlytekVoiceSDK/Intermediate/Build/Win64/UE4Editor/Inc/FlytekVoiceSDK/FlytekVoiceSDK.generated.dep.h
+Plugins/FlytekVoiceSDK/Intermediate/Build/Win64/UE4Editor/Inc/FlytekVoiceSDK/FlytekVoiceSDK.generated.h
+Plugins/FlytekVoiceSDK/Intermediate/Build/Win64/UE4Editor/Inc/FlytekVoiceSDK/FlytekVoiceSDKClasses.h
+Plugins/FlytekVoiceSDK/Intermediate/Build/Win64/UE4Editor/Inc/FlytekVoiceSDK/SpeechRecognizer.generated.h
+Plugins/FlytekVoiceSDK/Intermediate/Build/Win64/UE4Editor/Inc/FlytekVoiceSDK/SpeekRecognizerFunctionLibrary.generated.h
+Plugins/FlytekVoiceSDK/Intermediate/Build/Win64/UE4Editor/Development/UE4Editor-FlytekVoiceSDK.exp
+Plugins/FlytekVoiceSDK/Intermediate/Build/Win64/UE4Editor/Inc/FlytekVoiceSDK/Timestamp
+Plugins/FlytekVoiceSDK/Binaries/Win64/UE4Editor-FlytekVoiceSDK.dll
