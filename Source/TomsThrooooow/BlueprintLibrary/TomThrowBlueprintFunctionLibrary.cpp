@@ -31,11 +31,12 @@ void UTomThrowBlueprintFunctionLibrary::TravelLevel(UObject* WorldContextObject,
 	URL.Op.Add(Opition);
 	if (IsDevelopMode())
 	{
-		GEngine->SetClientTravel(World, *URL.ToString(), ETravelType::TRAVEL_Absolute);
+		//GEngine->SetClientTravel(World, *URL.ToString(), ETravelType::TRAVEL_Absolute);
+		World->ServerTravel(URL.ToString(), true);
 	}
 	else
 	{
-		World->ServerTravel(URL.ToString());
+		World->ServerTravel(URL.ToString(),true);
 	}
 	UE_LOG(LogTemp, Log, TEXT("URL : %s"), *URL.ToString())
 }

@@ -102,6 +102,10 @@ public:
 	void InitSessionSystem();
 protected:
 	TSharedPtr<const FUniqueNetId> GetPlayerUniqueID(APlayerController* PlayerController);
+	UPROPERTY()
+	UObject* World;
+	UPROPERTY()
+	APlayerController* PlayerController;
 private:
 	
 	void OnCreateCompleted(FName SessionName, bool bSuccess);
@@ -131,5 +135,5 @@ private:
 
 	TSharedPtr<FOnlineSessionSearch> SearchObject;
 	
-	UObject* World;
+	
 };

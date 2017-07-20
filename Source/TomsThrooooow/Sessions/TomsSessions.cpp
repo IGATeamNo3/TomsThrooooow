@@ -82,6 +82,7 @@ void UTomsSessions::JoinSessionWithSetting(UObject* WorldContextObject, APlayerC
 	{
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();
 		World = WorldContextObject;
+		PlayerController = PC;
 		TSharedPtr<const FUniqueNetId> UserID = GetPlayerUniqueID(PC);
 		if (Sessions.IsValid() && UserID.IsValid())
 		{
@@ -107,11 +108,11 @@ void UTomsSessions::DestroyTomsSession(UObject* WorldContextObject, APlayerContr
 	}
 }
 
-TSharedPtr<const FUniqueNetId> UTomsSessions::GetPlayerUniqueID(APlayerController* PlayerController)
+TSharedPtr<const FUniqueNetId> UTomsSessions::GetPlayerUniqueID(APlayerController* InPlayerController)
 {
 	TSharedPtr<const FUniqueNetId> UserID;
 
-	if (APlayerState* PlayerState = (PlayerController != NULL) ? PlayerController->PlayerState : NULL)
+	if (APlayerState* PlayerState = (InPlayerController != NULL) ? InPlayerController->PlayerState : NULL)
 	{
 		UserID = PlayerState->UniqueId.GetUniqueNetId();
 		if (!UserID.IsValid())
@@ -131,11 +132,14 @@ TSharedPtr<const FUniqueNetId> UTomsSessions::GetPlayerUniqueID(APlayerControlle
 
 FNamedOnlineSession* UTomsSessions::GetLocalSession() const
 {
-	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(World->GetWorld());
-	if (OSSPtr)
+	if (World)
 	{
-		return OSSPtr->GetSessionInterface()->GetNamedSession(GameSessionName);
-	}
+		IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(World->GetWorld());
+		if (OSSPtr)
+		{
+			return OSSPtr->GetSessionInterface()->GetNamedSession(GameSessionName);
+		}
+	}	
 	return nullptr;
 }
 
@@ -247,12 +251,30 @@ void UTomsSessions::OnJoinCompleted(FName InSessionName, EOnJoinSessionCompleteR
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
+			/*
+			if (Result == EOnJoinSessionCompleteResult::Success)
+			{
+				// Client travel to the server
+				FString ConnectString;
+				if (Sessions->GetResolvedConnectString(GameSessionName, ConnectString) && PlayerControllerWeakPtr.IsValid())
+				{
+					UE_LOG(LogOnline, Log, TEXT("Join session: traveling to %s"), *ConnectString);
+					PlayerControllerWeakPtr->ClientTravel(ConnectString, TRAVEL_Absolute);
+					OnSuccess.Broadcast();
+					return;
+				}
+			}*/
 			Sessions->ClearOnJoinSessionCompleteDelegate_Handle(JoinCompleteDelegateHandle);
 			FString ConnectString;
 			if (Sessions->GetResolvedConnectString(GameSessionName, ConnectString))
 			{
 				UE_LOG(LogTomThrow, Log, TEXT("Join Session: Traveling to %s"), *ConnectString)
-					OnJoinComplete.Broadcast(ECompeleteResult::EC_Success);
+				if (PlayerController)
+				{
+					PlayerController->ClientTravel(ConnectString, TRAVEL_Absolute);
+				}
+				OnJoinComplete.Broadcast(ECompeleteResult::EC_Success);
+				
 				return;
 			}
 		}
