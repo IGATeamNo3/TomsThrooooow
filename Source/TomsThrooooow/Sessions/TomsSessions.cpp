@@ -3,6 +3,7 @@
 #include "TomsThrooooow.h"
 #include "Online.h"
 #include "OnlineSubsystem.h"
+#include "OnlineSubsystemUtils.h"
 #include "OnlineSessionSettings.h"
 #include "TomsSessions.h"
 
@@ -26,12 +27,14 @@ UTomsSessions::~UTomsSessions()
 	}
 }
 
-void UTomsSessions::CreateSessionWithSetting(APlayerController* PC, bool bUseLAN)
+void UTomsSessions::CreateSessionWithSetting(UObject* WorldContextObject, APlayerController* PC, bool bUseLAN)
 {
-	IOnlineSubsystem* const OSSPtr = IOnlineSubsystem::Get();
+	
+	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(WorldContextObject->GetWorld());
 	if (OSSPtr)
 	{
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();
+		World = WorldContextObject;
 		TSharedPtr<const FUniqueNetId> UserID = GetPlayerUniqueID(PC);
 		if (Sessions.IsValid() && UserID.IsValid())
 		{
@@ -50,12 +53,13 @@ void UTomsSessions::CreateSessionWithSetting(APlayerController* PC, bool bUseLAN
 	}
 }
 
-void UTomsSessions::FindSessionsWithSetting(APlayerController* PC, int32 MaxResults, bool bUseLAN)
+void UTomsSessions::FindSessionsWithSetting(UObject* WorldContextObject, APlayerController* PC, int32 MaxResults, bool bUseLAN)
 {
-	IOnlineSubsystem* const OSSPtr = IOnlineSubsystem::Get();
+	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(WorldContextObject->GetWorld());
 	if (OSSPtr)
 	{
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();
+		World = WorldContextObject;
 		TSharedPtr<const FUniqueNetId> UserID = GetPlayerUniqueID(PC);
 		if (Sessions.IsValid() && UserID.IsValid())
 		{
@@ -72,12 +76,13 @@ void UTomsSessions::FindSessionsWithSetting(APlayerController* PC, int32 MaxResu
 	}
 }
 
-void UTomsSessions::JoinSessionWithSetting(APlayerController* PC, const FTomsBlueprintSessionResult& Session)
+void UTomsSessions::JoinSessionWithSetting(UObject* WorldContextObject, APlayerController* PC, const FTomsBlueprintSessionResult& Session)
 {
-	IOnlineSubsystem* const OSSPtr = IOnlineSubsystem::Get();
+	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(WorldContextObject->GetWorld());
 	if (OSSPtr)
 	{
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();
+		World = WorldContextObject;
 		TSharedPtr<const FUniqueNetId> UserID = GetPlayerUniqueID(PC);
 		if (Sessions.IsValid() && UserID.IsValid())
 		{
@@ -87,12 +92,13 @@ void UTomsSessions::JoinSessionWithSetting(APlayerController* PC, const FTomsBlu
 	}
 }
 
-void UTomsSessions::DestroyTomsSession(APlayerController* PC)
+void UTomsSessions::DestroyTomsSession(UObject* WorldContextObject, APlayerController* PC)
 {
-	IOnlineSubsystem* const OSSPtr = IOnlineSubsystem::Get();
+	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(WorldContextObject->GetWorld());
 	if (OSSPtr)
 	{
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();
+		World = WorldContextObject;
 		TSharedPtr<const FUniqueNetId> UserID = GetPlayerUniqueID(PC);
 		if (Sessions.IsValid() && UserID.IsValid())
 		{
@@ -135,7 +141,7 @@ void UTomsSessions::InitSessionSystem()
 
 void UTomsSessions::OnCreateCompleted(FName InSessionName, bool bSuccess)
 {
-	IOnlineSubsystem* const OSSPtr = IOnlineSubsystem::Get();
+	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(World->GetWorld());
 	if (OSSPtr)
 	{
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();
@@ -159,7 +165,7 @@ void UTomsSessions::OnCreateCompleted(FName InSessionName, bool bSuccess)
 
 void UTomsSessions::OnStartCompleted(FName InSessionName, bool bSuccess)
 {
-	IOnlineSubsystem* const OSSPtr = IOnlineSubsystem::Get();
+	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(World->GetWorld());
 	if (OSSPtr)
 	{
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();
@@ -184,7 +190,7 @@ void UTomsSessions::OnStartCompleted(FName InSessionName, bool bSuccess)
 void UTomsSessions::OnFindCompleted(bool bSuccess)
 {
 	TArray<FTomsBlueprintSessionResult> Results;
-	IOnlineSubsystem* const OSSPtr = IOnlineSubsystem::Get();
+	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(World->GetWorld());
 	if (OSSPtr)
 	{
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();
@@ -210,7 +216,7 @@ void UTomsSessions::OnFindCompleted(bool bSuccess)
 }
 void UTomsSessions::OnJoinCompleted(FName InSessionName, EOnJoinSessionCompleteResult::Type Result)
 {
-	IOnlineSubsystem* const OSSPtr = IOnlineSubsystem::Get();
+	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(World->GetWorld());
 	if (OSSPtr)
 	{
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();
@@ -232,7 +238,7 @@ void UTomsSessions::OnJoinCompleted(FName InSessionName, EOnJoinSessionCompleteR
 
 void UTomsSessions::OnDestroyCompleted(FName InSessionName, bool bSuccess)
 {
-	IOnlineSubsystem* const OSSPtr = IOnlineSubsystem::Get();
+	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(World->GetWorld());
 	if (OSSPtr)
 	{
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();

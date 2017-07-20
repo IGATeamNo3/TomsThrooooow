@@ -54,16 +54,17 @@ public:
 
 
 
-	UFUNCTION(BlueprintCallable, Category = Sessions)
-		void CreateSessionWithSetting(APlayerController* PC, bool bUseLAN);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = Sessions)
+		void CreateSessionWithSetting(UObject* WorldContextObject, APlayerController* PC, bool bUseLAN);
 
-	UFUNCTION(BlueprintCallable, Category = Sessions)
-		void FindSessionsWithSetting(APlayerController* PC, int32 MaxResults, bool bUseLAN);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = Sessions)
+		void FindSessionsWithSetting(UObject* WorldContextObject, APlayerController* PC, int32 MaxResults, bool bUseLAN);
 
-	UFUNCTION(BlueprintCallable, Category = Sessions)
-		void JoinSessionWithSetting(APlayerController* PC, const FTomsBlueprintSessionResult& Session);
-	UFUNCTION(BlueprintCallable, Category = Sessions)
-		void DestroyTomsSession(APlayerController* PC);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = Sessions)
+		void JoinSessionWithSetting(UObject* WorldContextObject, APlayerController* PC, const FTomsBlueprintSessionResult& Session);
+
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = Sessions)
+		void DestroyTomsSession(UObject* WorldContextObject, APlayerController* PC);
 	
 	UFUNCTION(BlueprintPure, Category = Sessions)
 	static FString GetServerName(const FTomsBlueprintSessionResult& Result)
@@ -103,5 +104,5 @@ private:
 
 	TSharedPtr<FOnlineSessionSearch> SearchObject;
 	
-	
+	UObject* World;
 };
