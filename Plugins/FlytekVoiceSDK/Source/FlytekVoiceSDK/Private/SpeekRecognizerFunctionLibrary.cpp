@@ -1,7 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-#include "FlytekVoiceSDK.h"
+#include "FlytekVoiceSDKPrivatePCH.h"
 #include "SpeekRecognizerFunctionLibrary.h"
+//#include "FlytekVoiceSDK.h"
 
 
 USpeechRecognizer* USpeekRecognizerFunctionLibrary::InitializeSpeechRecognizer(ESpeechLanguage InLanguage, bool IsContinuous)

@@ -5,7 +5,8 @@ using UnrealBuildTool;
 public class FlytekVoiceSDK : ModuleRules
 {
     public FlytekVoiceSDK(TargetInfo Target)
-    {
+    {     
+
         PublicIncludePaths.AddRange(
             new string[] {
                 "FlytekVoiceSDK/Public"
