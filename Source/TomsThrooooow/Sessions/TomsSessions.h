@@ -4,6 +4,7 @@
 
 #include "UObject/NoExportTypes.h"
 #include "OnlineSessionInterface.h"
+#include "OnlineSessionSettings.h"
 #include "TomsSessions.generated.h"
 
 /**
@@ -66,12 +67,36 @@ public:
 	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = Sessions)
 		void DestroyTomsSession(UObject* WorldContextObject, APlayerController* PC);
 	
+
 	UFUNCTION(BlueprintPure, Category = Sessions)
 	static FString GetServerName(const FTomsBlueprintSessionResult& Result)
 	{
 		return Result.OnlineResult.Session.OwningUserName;
 	}
+
+	UFUNCTION(BlueprintPure, Category = Sessions)
+	static int32 GetCurrentPlayers(const FTomsBlueprintSessionResult& Result)
+	{
+		return Result.OnlineResult.Session.SessionSettings.NumPublicConnections - Result.OnlineResult.Session.NumOpenPublicConnections;
+	}
+
+	UFUNCTION(BlueprintPure, Category = Sessions)
+	static int32 GetMaxPlayers(const FTomsBlueprintSessionResult& Result)
+	{
+		return Result.OnlineResult.Session.SessionSettings.NumPublicConnections;
+	}
+
+	UFUNCTION(BlueprintPure, Category = Sessions)
+	static int32 GetPingInMs(const FTomsBlueprintSessionResult& Result)
+	{
+		return Result.OnlineResult.PingInMs;
+	}
+
+	UFUNCTION(BlueprintPure, Category = Sessions)
+	TArray<FString> GetPlayerNames();
 	
+	//UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = Sessions)
+
 public:
 	
 	void InitSessionSystem();
@@ -84,6 +109,8 @@ private:
 	void OnFindCompleted(bool bSuccess);
 	void OnDestroyCompleted(FName SessionName, bool bWasSuccessful);
 	void OnJoinCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+
+	FNamedOnlineSession* GetLocalSession() const;
 private:
 	
 	FOnCreateSessionCompleteDelegate CreateCompleteDelegate;

@@ -4,7 +4,6 @@
 #include "Online.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
-#include "OnlineSessionSettings.h"
 #include "TomsSessions.h"
 
 
@@ -129,6 +128,32 @@ TSharedPtr<const FUniqueNetId> UTomsSessions::GetPlayerUniqueID(APlayerControlle
 	return UserID;
 }
 
+
+FNamedOnlineSession* UTomsSessions::GetLocalSession() const
+{
+	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(World->GetWorld());
+	if (OSSPtr)
+	{
+		return OSSPtr->GetSessionInterface()->GetNamedSession(GameSessionName);
+	}
+	return nullptr;
+}
+
+TArray<FString> UTomsSessions::GetPlayerNames()
+{
+	TArray<FString> PlayerNames;
+	FNamedOnlineSession* Sessions = GetLocalSession();
+	if (Sessions)
+	{
+		TArray< TSharedRef<const FUniqueNetId> > PlayerIDs = Sessions->RegisteredPlayers;
+		for (auto Player : PlayerIDs)
+		{
+			PlayerNames.Add(Player.Get().ToString());
+		}
+	}
+	
+	return PlayerNames;
+}
 
 void UTomsSessions::InitSessionSystem()
 {
