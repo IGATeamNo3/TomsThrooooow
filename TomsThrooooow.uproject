@@ -17,6 +17,10 @@
 		{
 			"Name": "FlytekVoiceSDK",
 			"Enabled": true
+		},
+		{
+			"Name": "HyperealVR",
+			"Enabled": true
 		}
 	]
 }
