@@ -30,6 +30,7 @@ struct FTomsBlueprintReadFriendResult
 {
 	GENERATED_USTRUCT_BODY()
 public:
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Sessions)
 	FString FriendName;
 };
 
