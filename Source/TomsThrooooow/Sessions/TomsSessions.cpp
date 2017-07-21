@@ -159,6 +159,39 @@ TArray<FString> UTomsSessions::GetPlayerNames()
 	return PlayerNames;
 }
 
+FTomsBlueprintSessionResult UTomsSessions::GetLocalBPSession()
+{
+	FTomsBlueprintSessionResult BPResult;
+	//BPResult.OnlineResult = GetLocalSession()->
+	
+	return BPResult;
+}
+
+TArray<FString> UTomsSessions::GetFriendList(UObject* WorldContextObject)
+{
+	TArray<FString> PlayerNames;
+	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(WorldContextObject->GetWorld()/*, TEXT("Steam")*/);
+	if (OSSPtr)
+	{
+		IOnlineFriendsPtr OnlineFriends = OSSPtr->GetFriendsInterface();
+		
+		FString ListName;
+		TArray<TSharedRef<FOnlineFriend>> FriendList;
+		if (OnlineFriends.IsValid() && OnlineFriends->GetFriendsList(0, ListName, FriendList))
+		{
+			for (int i = 0 ; i < FriendList.Num(); i++)
+			{		
+				PlayerNames.Add(FriendList[i].Get().GetDisplayName());
+			}
+		}
+		else
+		{
+			UE_LOG(LogTomThrow, Error, TEXT("Get Friend List Faild"));
+		}
+	}
+	return PlayerNames;
+}
+
 void UTomsSessions::InitSessionSystem()
 {
 	CreateCompleteDelegate = FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateCompleted);

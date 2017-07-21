@@ -94,7 +94,13 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Sessions)
 	TArray<FString> GetPlayerNames();
+
+	UFUNCTION(BlueprintPure, Category = Sessions)
+	FTomsBlueprintSessionResult GetLocalBPSession();
 	
+
+	UFUNCTION(BlueprintPure, meta = (WorldContext = "WorldContextObject"), Category = Sessions)
+		TArray<FString> GetFriendList(UObject* WorldContextObject);
 	//UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = Sessions)
 
 public:
