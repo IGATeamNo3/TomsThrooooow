@@ -5,6 +5,7 @@
 #include "UObject/NoExportTypes.h"
 #include "OnlineSessionInterface.h"
 #include "OnlineSessionSettings.h"
+#include "OnlineFriendsInterface.h"
 #include "TomsSessions.generated.h"
 
 /**
@@ -24,6 +25,14 @@ struct FTomsBlueprintSessionResult
 public:
 	FOnlineSessionSearchResult OnlineResult;
 };
+USTRUCT(BlueprintType)
+struct FTomsBlueprintReadFriendResult
+{
+	GENERATED_USTRUCT_BODY()
+public:
+	FString FriendName;
+};
+
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCreateSession, ECompeleteResult, Result);
 
@@ -32,6 +41,9 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnFindSession, ECompeleteResult, R
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnJoinSession, ECompeleteResult, Result);
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnDestroySession, ECompeleteResult, Result);
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGetFriendsList, ECompeleteResult, Result, const TArray<FTomsBlueprintReadFriendResult>&, FriendsList);
+
 
 UCLASS(BlueprintType)
 class TOMSTHROOOOOW_API UTomsSessions : public UObject
@@ -51,6 +63,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = Sessions)
 		FOnDestroySession OnDestroyComplete;
+
+	UPROPERTY(BlueprintAssignable, Category = Sessions)
+		FOnGetFriendsList OnGetFriendListComplete;
 public:
 
 
@@ -99,8 +114,8 @@ public:
 	FTomsBlueprintSessionResult GetLocalBPSession();
 	
 
-	UFUNCTION(BlueprintPure, meta = (WorldContext = "WorldContextObject"), Category = Sessions)
-		TArray<FString> GetFriendList(UObject* WorldContextObject);
+	UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = Sessions)
+		void GetFriendListRequest(UObject* WorldContextObject);
 	//UFUNCTION(BlueprintCallable, meta = (WorldContext = "WorldContextObject"), Category = Sessions)
 
 public:
@@ -119,7 +134,7 @@ private:
 	void OnFindCompleted(bool bSuccess);
 	void OnDestroyCompleted(FName SessionName, bool bWasSuccessful);
 	void OnJoinCompleted(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
-
+	void OnReadFriendsCompleted(int32 LocalPlayer, bool bWasSuccessful, const FString& ListName, const FString& ErrorString);
 	FNamedOnlineSession* GetLocalSession() const;
 private:
 	
@@ -132,6 +147,8 @@ private:
 	FOnJoinSessionCompleteDelegate JoinCompleteDelegate;
 
 	FOnDestroySessionCompleteDelegate DestroyCompleteDelegate;
+
+	FOnReadFriendsListComplete ReadFriendsListCompleteDelegate;
 	
 	FDelegateHandle CreateCompleteDelegateHandle;
 	FDelegateHandle StartCompleteDelegateHandle;

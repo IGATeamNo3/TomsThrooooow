@@ -167,29 +167,27 @@ FTomsBlueprintSessionResult UTomsSessions::GetLocalBPSession()
 	return BPResult;
 }
 
-TArray<FString> UTomsSessions::GetFriendList(UObject* WorldContextObject)
+void UTomsSessions::GetFriendListRequest(UObject* WorldContextObject)
 {
-	TArray<FString> PlayerNames;
+	World = WorldContextObject;
 	IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(WorldContextObject->GetWorld()/*, TEXT("Steam")*/);
 	if (OSSPtr)
 	{
 		IOnlineFriendsPtr OnlineFriends = OSSPtr->GetFriendsInterface();
 		
-		FString ListName;
-		TArray<TSharedRef<FOnlineFriend>> FriendList;
-		if (OnlineFriends.IsValid() && OnlineFriends->GetFriendsList(0, ListName, FriendList))
-		{
-			for (int i = 0 ; i < FriendList.Num(); i++)
-			{		
-				PlayerNames.Add(FriendList[i].Get().GetDisplayName());
-			}
-		}
-		else
-		{
-			UE_LOG(LogTomThrow, Error, TEXT("Get Friend List Faild"));
-		}
+		FString ListName;		 
+
+		ReadFriendsListCompleteDelegate.CreateUObject(this, &ThisClass::OnReadFriendsCompleted);
+
+		OnlineFriends->ReadFriendsList(0, ListName, ReadFriendsListCompleteDelegate);
+		UE_LOG(LogTomThrow, Error, TEXT("Request Friend List"));
 	}
-	return PlayerNames;
+	else
+	{
+		TArray<FTomsBlueprintReadFriendResult> List;
+		OnGetFriendListComplete.Broadcast(ECompeleteResult::EC_Failure, List);
+		UE_LOG(LogTomThrow, Error, TEXT("Get Friend List Faild"));
+	}
 }
 
 void UTomsSessions::InitSessionSystem()
@@ -284,19 +282,6 @@ void UTomsSessions::OnJoinCompleted(FName InSessionName, EOnJoinSessionCompleteR
 		IOnlineSessionPtr Sessions = OSSPtr->GetSessionInterface();
 		if (Sessions.IsValid())
 		{
-			/*
-			if (Result == EOnJoinSessionCompleteResult::Success)
-			{
-				// Client travel to the server
-				FString ConnectString;
-				if (Sessions->GetResolvedConnectString(GameSessionName, ConnectString) && PlayerControllerWeakPtr.IsValid())
-				{
-					UE_LOG(LogOnline, Log, TEXT("Join session: traveling to %s"), *ConnectString);
-					PlayerControllerWeakPtr->ClientTravel(ConnectString, TRAVEL_Absolute);
-					OnSuccess.Broadcast();
-					return;
-				}
-			}*/
 			Sessions->ClearOnJoinSessionCompleteDelegate_Handle(JoinCompleteDelegateHandle);
 			FString ConnectString;
 			if (Sessions->GetResolvedConnectString(GameSessionName, ConnectString))
@@ -314,6 +299,35 @@ void UTomsSessions::OnJoinCompleted(FName InSessionName, EOnJoinSessionCompleteR
 	}
 	OnJoinComplete.Broadcast(ECompeleteResult::EC_Failure);
 
+}
+
+void UTomsSessions::OnReadFriendsCompleted(int32 LocalPlayer, bool bWasSuccessful, const FString& ListName, const FString& ErrorString)
+{
+	TArray<FTomsBlueprintReadFriendResult> List;
+	if (bWasSuccessful)
+	{
+		IOnlineSubsystem* const OSSPtr = Online::GetSubsystem(World->GetWorld()/*, TEXT("Steam")*/);
+		if (OSSPtr)
+		{
+			IOnlineFriendsPtr OnlineFriends = OSSPtr->GetFriendsInterface();
+
+			TArray<TSharedRef<FOnlineFriend>> FriendList;
+			if (OnlineFriends.IsValid() && OnlineFriends->GetFriendsList(0, ListName, FriendList))
+			{
+				for (int i = 0; i < FriendList.Num(); i++)
+				{
+					FTomsBlueprintReadFriendResult BPFriend;
+					BPFriend.FriendName = FriendList[i].Get().GetDisplayName();
+					List.Add(BPFriend);			
+				}
+				OnGetFriendListComplete.Broadcast(ECompeleteResult::EC_Success, List);
+				return;
+			}
+		}
+	}
+	OnGetFriendListComplete.Broadcast(ECompeleteResult::EC_Failure, List);
+	UE_LOG(LogTomThrow, Error, TEXT("Get Friend List Faild"));
+	
 }
 
 void UTomsSessions::OnDestroyCompleted(FName InSessionName, bool bSuccess)
