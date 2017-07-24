@@ -174,13 +174,9 @@ void UTomsSessions::GetFriendListRequest(UObject* WorldContextObject)
 	if (OSSPtr)
 	{
 		IOnlineFriendsPtr OnlineFriends = OSSPtr->GetFriendsInterface();
-		
-		FString ListName;		 
 
-		ReadFriendsListCompleteDelegate.CreateUObject(this, &ThisClass::OnReadFriendsCompleted);
-
-		OnlineFriends->ReadFriendsList(0, ListName, ReadFriendsListCompleteDelegate);
-		UE_LOG(LogTomThrow, Error, TEXT("Request Friend List"));
+		OnlineFriends->ReadFriendsList(0, EFriendsLists::ToString(EFriendsLists::Default), ReadFriendsListCompleteDelegate);
+		UE_LOG(LogTomThrow, Log, TEXT("Request Friend List"));
 	}
 	else
 	{
@@ -197,6 +193,7 @@ void UTomsSessions::InitSessionSystem()
 	FindCompleteDelegate = FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindCompleted);
 	DestroyCompleteDelegate = FOnDestroySessionCompleteDelegate::CreateUObject(this, &ThisClass::OnDestroyCompleted);
 	JoinCompleteDelegate = FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinCompleted);
+	ReadFriendsListCompleteDelegate = FOnReadFriendsListComplete::CreateUObject(this, &ThisClass::OnReadFriendsCompleted);
 }
 
 void UTomsSessions::OnCreateCompleted(FName InSessionName, bool bSuccess)
@@ -310,7 +307,7 @@ void UTomsSessions::OnReadFriendsCompleted(int32 LocalPlayer, bool bWasSuccessfu
 		if (OSSPtr)
 		{
 			IOnlineFriendsPtr OnlineFriends = OSSPtr->GetFriendsInterface();
-
+			//FString ListName;
 			TArray<TSharedRef<FOnlineFriend>> FriendList;
 			if (OnlineFriends.IsValid() && OnlineFriends->GetFriendsList(0, ListName, FriendList))
 			{
