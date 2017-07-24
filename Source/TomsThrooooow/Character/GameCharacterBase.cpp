@@ -62,12 +62,28 @@ void AGameCharacterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& O
 
 void AGameCharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	// set up gameplay key bindings
-	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &AGameCharacterBase::Jump);
-	PlayerInputComponent->BindAction("Jump", IE_Released, this, &ACharacter::StopJumping);
-	PlayerInputComponent->BindAction("PickOrThrow", IE_Pressed, this, &AGameCharacterBase::PickOrThrow);
-	PlayerInputComponent->BindAxis("MoveRight", this, &AGameCharacterBase::MoveRight);
-	PlayerInputComponent->BindAxis("LookUp", this, &AGameCharacterBase::LookUp);
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (PC)
+	{
+		int32 id = PC->GetLocalPlayer()->GetControllerId();
+		if (id == 0)
+		{
+			PlayerInputComponent->BindAction("Jump_Keyboard1", IE_Pressed, this, &ACharacter::Jump);
+			PlayerInputComponent->BindAction("Jump_Keyboard1", IE_Released, this, &ACharacter::StopJumping);
+			PlayerInputComponent->BindAxis("MoveRight_Keyboard1", this, &AGameCharacterBase::MoveRight);
+			PlayerInputComponent->BindAxis("LookUp_Keyboard1", this, &AGameCharacterBase::LookUp);
+			PlayerInputComponent->BindAction("PickOrThrow_Keyboard1", IE_Pressed, this, &AGameCharacterBase::PickOrThrow);
+		}
+		else if (id == 1)
+		{
+			PlayerInputComponent->BindAction("Jump_Keyboard2", IE_Pressed, this, &ACharacter::Jump);
+			PlayerInputComponent->BindAction("Jump_Keyboard2", IE_Released, this, &ACharacter::StopJumping);
+			PlayerInputComponent->BindAxis("MoveRight_Keyboard2", this, &AGameCharacterBase::MoveRight);
+			PlayerInputComponent->BindAxis("LookUp_Keyboard2", this, &AGameCharacterBase::LookUp);
+			PlayerInputComponent->BindAction("PickOrThrow_Keyboard2", IE_Pressed, this, &AGameCharacterBase::PickOrThrow);
+		}
+	}
+
 
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 }
@@ -161,7 +177,7 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 					PickedActor = Overlaps[i];
 
 					AGameCharacterBase* ThrowableActor = Cast<AGameCharacterBase>(PickedActor);
-					if (ThrowableActor /*&& ThrowableActor->bIsStunning*/)
+					if (ThrowableActor && ThrowableActor->bIsStunning)
 					{
 						// Attach to PickRoot
 						ThrowableActor->OnPick();
