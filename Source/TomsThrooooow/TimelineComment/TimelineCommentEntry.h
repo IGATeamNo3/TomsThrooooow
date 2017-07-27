@@ -3,9 +3,21 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "Components/WidgetComponent.h"
 #include "TimelineCommentEntry.generated.h"
 
-UCLASS(/*NotPlaceable*/)
+UCLASS()
+class TOMSTHROOOOOW_API UMyWidgetComponent : public UWidgetComponent
+{
+	GENERATED_BODY()
+public:
+	// Sets default values for this actor's properties
+	UMyWidgetComponent(const FObjectInitializer& ObjectInitializer);
+
+	FIntPoint GetCurrentDrawSize() { return CurrentDrawSize; }
+};
+
+UCLASS(NotPlaceable)
 class TOMSTHROOOOOW_API ATimelineCommentEntry : public AActor
 {
 	GENERATED_BODY()
@@ -20,16 +32,14 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	FORCEINLINE void SetText(const FText& Value)
-	{
-		TextRender->SetText(Value);
-	}
+	void SetText(const FText& Value);
 
-	FORCEINLINE FBoxSphereBounds CalcBounds() const
+	FORCEINLINE FIntPoint GetCurrentDrawSize() const
 	{
-		return TextRender->CalcBounds(GetActorTransform());
+		return Widget->GetCurrentDrawSize();
 	}
 private:
 	class UTextRenderComponent* TextRender;
-	//class UWidgetComponent* Widget;
+
+	class UMyWidgetComponent* Widget;
 };

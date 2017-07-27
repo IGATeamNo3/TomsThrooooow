@@ -6,13 +6,26 @@ public class TomsThrooooow : ModuleRules
 {
 	public TomsThrooooow(TargetInfo Target)
 	{
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore"});
+        PublicDependencyModuleNames.AddRange(
+            new string[] 
+            {
+                "Core",
+                "CoreUObject",
+                "Engine",
+                "InputCore",
+                "OnlineSubsystem",
+                "OnlineSubsystemUtils"
+            }
+        );
 
-        PublicDependencyModuleNames.AddRange(new string[] {
-            "OnlineSubsystem",
-            "OnlineSubsystemUtils"
-        });
-        //Load Steam Online Module
+        PrivateDependencyModuleNames.AddRange(
+            new string[]
+            {
+                "Slate",
+                "SlateCore"
+            }
+        );
+
         DynamicallyLoadedModuleNames.Add("OnlineSubsystemSteam");
     }
 }

@@ -69,9 +69,9 @@ void ATimelineCommentManager::Tick( float DeltaTime )
 	for (int32 Index = 0; Index < TimelineCommentEntrys.Num(); Index++)
 	{
 		ATimelineCommentEntry* Entry = TimelineCommentEntrys[Index];
-		FBoxSphereBounds Bounds = Entry->CalcBounds();
+		FIntPoint Bounds = Entry->GetCurrentDrawSize();
 
-		if (Entry->GetActorLocation().Y - Bounds.GetBox().GetExtent().Y > Width / 2)
+		if (Entry->GetActorLocation().Y - Bounds.X > Width / 2)
 		{
 			TimelineCommentEntrys[Index]->Destroy();
 			TimelineCommentEntrys.RemoveAtSwap(Index);

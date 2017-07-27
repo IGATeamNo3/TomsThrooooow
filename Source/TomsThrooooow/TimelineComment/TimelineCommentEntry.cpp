@@ -1,8 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 #include "TomsThrooooow.h"
+#include "Blueprint/UserWidget.h"
+#include "Components/TextBlock.h"
 #include "TimelineCommentEntry.h"
 
+
+UMyWidgetComponent::UMyWidgetComponent(const FObjectInitializer& ObjectInitializer)
+{
+	bDrawAtDesiredSize = true;
+}
 
 // Sets default values
 ATimelineCommentEntry::ATimelineCommentEntry(const FObjectInitializer& ObjectInitializer)
@@ -14,7 +21,13 @@ ATimelineCommentEntry::ATimelineCommentEntry(const FObjectInitializer& ObjectIni
 	TextRender->SetVerticalAlignment(EVerticalTextAligment::EVRTA_TextCenter);
 	TextRender->SetWorldSize(60);
 
-	RootComponent = TextRender;
+	// TODO every time to load is not good
+	Widget = CreateDefaultSubobject<UMyWidgetComponent>(TEXT("Widget"));
+	TSubclassOf<UUserWidget> WidgetClass = LoadClass<UUserWidget>(NULL, TEXT("WidgetBlueprint'/Game/TomsThrooooow/Blueprints/UI/UMG_TimelineCommentEntry.UMG_TimelineCommentEntry_C'"));
+	Widget->SetWidgetClass(WidgetClass);
+	Widget->SetPivot(FVector2D(0,0.5f));
+
+	RootComponent = Widget;
 }
 
 // Called when the game starts or when spawned
@@ -28,7 +41,24 @@ void ATimelineCommentEntry::Tick( float DeltaTime )
 {
 	Super::Tick( DeltaTime );
 
-	FBoxSphereBounds Bounds = TextRender->CalcBounds(GetActorTransform());
-	DrawDebugBox(GetWorld(), Bounds.GetBox().GetCenter(), Bounds.GetBox().GetExtent(), FColor(255, 128, 0), false, -1, 0, 20);
+	FIntPoint DrawSize = Widget->GetCurrentDrawSize();
+	DrawDebugBox(GetWorld(), Widget->K2_GetComponentLocation() + FVector(0, -DrawSize.X / 2 , 0), FVector(0.f, DrawSize.X / 2, DrawSize.Y / 2), FColor(255, 128, 0), false, -1, 0, 20);
+}
+
+void ATimelineCommentEntry::SetText(const FText& Value)
+{
+	UUserWidget* UserWidget = Widget->GetUserWidgetObject();
+	if (!UserWidget)
+	{
+		return;
+	}
+
+	UTextBlock* TimelineCommentTextWidget = Cast<UTextBlock>(UserWidget->GetWidgetFromName(FName("TimelineCommentText")));
+	if (!TimelineCommentTextWidget)
+	{
+		return;
+	}
+
+	TimelineCommentTextWidget->SetText(Value);
 }
 

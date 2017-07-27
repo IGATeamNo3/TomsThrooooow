@@ -37,6 +37,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = TimelineCommentManager)
 	float EntryMoveSpeed;
 
+	UPROPERTY(EditAnywhere, Category = TimelineCommentManager)
+	TSubclassOf<UUserWidget> TimelineCommentWidgetClass;
+
 	float Width;
 	float Height;
 
