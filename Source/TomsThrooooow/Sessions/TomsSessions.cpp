@@ -87,7 +87,12 @@ void UTomsSessions::JoinSessionWithSetting(UObject* WorldContextObject, APlayerC
 		if (Sessions.IsValid() && UserID.IsValid())
 		{
 			JoinCompleteDelegateHandle = Sessions->AddOnJoinSessionCompleteDelegate_Handle(JoinCompleteDelegate);
-			Sessions->JoinSession(*UserID, GameSessionName, Session.OnlineResult);
+			if (!Sessions->JoinSession(*UserID, GameSessionName, Session.OnlineResult))
+			{
+				UE_LOG(LogTomThrow, Warning, TEXT("Join Session Faild"))
+				OnJoinComplete.Broadcast(ECompeleteResult::EC_Failure);
+			}
+			
 		}
 	}
 }
