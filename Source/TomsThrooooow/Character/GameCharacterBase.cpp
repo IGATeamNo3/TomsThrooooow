@@ -146,9 +146,7 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 			FVector ThrowVector;
 			if (RightInput == .0f && UpInput == .0f)
 			{
-#if WITH_EDITORONLY_DATA			
-					ThrowVector = GetArrowComponent()->GetForwardVector() * ThrowStrength;
-#endif			
+				ThrowVector = GetActorForwardVector() * ThrowStrength;
 			}
 			// with input throw
 			else
