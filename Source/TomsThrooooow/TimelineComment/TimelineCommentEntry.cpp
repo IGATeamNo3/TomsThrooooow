@@ -17,10 +17,6 @@ ATimelineCommentEntry::ATimelineCommentEntry(const FObjectInitializer& ObjectIni
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	TextRender = CreateDefaultSubobject<UTextRenderComponent>(TEXT("NewTextRenderComponent"));
-	TextRender->SetVerticalAlignment(EVerticalTextAligment::EVRTA_TextCenter);
-	TextRender->SetWorldSize(60);
-
 	// TODO every time to load is not good
 	Widget = CreateDefaultSubobject<UMyWidgetComponent>(TEXT("Widget"));
 	TSubclassOf<UUserWidget> WidgetClass = LoadClass<UUserWidget>(NULL, TEXT("WidgetBlueprint'/Game/TomsThrooooow/Blueprints/UI/UMG_TimelineCommentEntry.UMG_TimelineCommentEntry_C'"));

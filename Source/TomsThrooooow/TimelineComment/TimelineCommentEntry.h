@@ -39,7 +39,5 @@ public:
 		return Widget->GetCurrentDrawSize();
 	}
 private:
-	class UTextRenderComponent* TextRender;
-
 	class UMyWidgetComponent* Widget;
 };
