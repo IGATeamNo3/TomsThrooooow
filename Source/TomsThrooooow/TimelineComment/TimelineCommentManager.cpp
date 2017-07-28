@@ -21,6 +21,8 @@ ATimelineCommentManager::ATimelineCommentManager(const FObjectInitializer& Objec
 
 	// Property Initialize
 	EntryMoveSpeed = 400;
+	Width = 400;
+	Height = 300;
 }
 	
 // Called when the game starts or when spawned
@@ -49,8 +51,6 @@ void ATimelineCommentManager::BeginPlay()
 			}
 		}
 	}
-
-	//TODO: if Director Camera not exists, what should I do?
 
 	Super::BeginPlay();
 }
