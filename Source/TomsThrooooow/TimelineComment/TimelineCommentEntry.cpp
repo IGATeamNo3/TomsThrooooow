@@ -42,7 +42,7 @@ void ATimelineCommentEntry::Tick( float DeltaTime )
 	Super::Tick( DeltaTime );
 
 	FIntPoint DrawSize = Widget->GetCurrentDrawSize();
-	DrawDebugBox(GetWorld(), Widget->K2_GetComponentLocation() + FVector(0, -DrawSize.X / 2 , 0), FVector(0.f, DrawSize.X / 2, DrawSize.Y / 2), FColor(255, 128, 0), false, -1, 0, 20);
+	DrawDebugBox(GetWorld(), Widget->K2_GetComponentLocation() + FVector(0, -DrawSize.X / 2 , 0), FVector(0.f, DrawSize.X / 2, DrawSize.Y / 2), FColor(255, 128, 0), false, -1, 0, 10);
 }
 
 void ATimelineCommentEntry::SetText(const FText& Value)
