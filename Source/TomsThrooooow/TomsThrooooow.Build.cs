@@ -22,7 +22,8 @@ public class TomsThrooooow : ModuleRules
             new string[]
             {
                 "Slate",
-                "SlateCore"
+                "SlateCore",
+                "FlytekVoiceSDK"
             }
         );
 

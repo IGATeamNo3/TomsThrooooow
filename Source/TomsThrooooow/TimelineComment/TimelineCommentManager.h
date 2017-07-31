@@ -3,6 +3,7 @@
 #pragma once
 
 #include "GameFramework/Actor.h"
+#include "UserWidget.h"
 #include "TimelineCommentManager.generated.h"
 
 class ATimelineCommentEntry;
@@ -22,8 +23,8 @@ public:
 	// Called every frame
 	virtual void Tick( float DeltaSeconds ) override;
 
-	UFUNCTION(BlueprintCallable, Category = TimelineCommentManager)
-	void AddVoiceText(const FString& Value);
+	UFUNCTION(Reliable, NetMulticast)
+	void BroadcastVoiceText(const FString& Value);
 
 private:
 	void DrawDebugData(UWorld* InWorld, bool bPersistant = false, float lifeTime = -1);

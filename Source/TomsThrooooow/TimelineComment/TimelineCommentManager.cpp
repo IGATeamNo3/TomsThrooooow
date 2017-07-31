@@ -23,6 +23,8 @@ ATimelineCommentManager::ATimelineCommentManager(const FObjectInitializer& Objec
 	EntryMoveSpeed = 400;
 	Width = 400;
 	Height = 300;
+
+	SetReplicates(true);
 }
 	
 // Called when the game starts or when spawned
@@ -84,7 +86,7 @@ void ATimelineCommentManager::Tick( float DeltaTime )
 	}
 }
 
-void ATimelineCommentManager::AddVoiceText(const FString& Value)
+void ATimelineCommentManager::BroadcastVoiceText_Implementation(const FString& Value)
 {
 	UWorld* CurWorld = GetWorld();
 	if (CurWorld)
