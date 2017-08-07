@@ -15,7 +15,9 @@ ATimelineCommentManager::ATimelineCommentManager(const FObjectInitializer& Objec
 
 	SceneComponent = CreateDefaultSubobject<USceneComponent>(TEXT("SceneComponent"));
 	SceneComponent->Mobility = EComponentMobility::Movable;
+#if WITH_EDITORONLY_DATA
 	SceneComponent->bVisualizeComponent = true;
+#endif
 
 	RootComponent = SceneComponent;
 
