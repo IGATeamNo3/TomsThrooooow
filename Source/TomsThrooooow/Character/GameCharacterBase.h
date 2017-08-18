@@ -34,6 +34,9 @@ protected:
 	UCapsuleComponent* PickCheckCapsule;
 
 	UPROPERTY(VisibleAnywhere, Category = "PickAndThrow")
+	UCapsuleComponent* HitCheckCapsule;
+
+	UPROPERTY(VisibleAnywhere, Category = "PickAndThrow")
 	USceneComponent* PickRoot;	
 	
 	UPROPERTY(EditAnywhere, Category = "PickAndThrow")
@@ -41,8 +44,6 @@ protected:
 private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerPickOrThrow(float RightInput,float UpInput);
-	void ServerPickOrThrow_Implementation(float RightInput, float UpInput);
-	bool ServerPickOrThrow_Validate(float RightInput, float UpInput);
 	void PickOrThrowWithInput(float RightInput, float UpInput);
 
 	/** Implement IThrowableInterface start*/
