@@ -19,6 +19,8 @@ AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectIni
 
 	// Change ignore to PhysicsBody, use HitCheckCapsule to check hit
 	// this is for that character can stand on throwing item
+	//GetCapsuleComponent()->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Ignore);
+	//GetMesh()->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Ignore);
 
 	// Configure character movement
 	GetCharacterMovement()->bOrientRotationToMovement = true; // Face in the direction we are moving..
@@ -46,7 +48,9 @@ AGameCharacterBase::AGameCharacterBase(const class FObjectInitializer& ObjectIni
 	HitCheckCapsule->SetRelativeLocation(FVector(0, 0, 0));
 	HitCheckCapsule->SetCapsuleHalfHeight(80);
 	HitCheckCapsule->SetCapsuleRadius(45, false);
+	//HitCheckCapsule->SetCollisionProfileName(UCollisionProfile::Pawn_ProfileName);
 	HitCheckCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
+	//HitCheckCapsule->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Block);
 	HitCheckCapsule->SetupAttachment(GetCapsuleComponent());
 
 	// Configure PickRoot
