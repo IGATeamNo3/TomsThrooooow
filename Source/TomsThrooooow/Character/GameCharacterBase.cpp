@@ -2,6 +2,7 @@
 
 #include "TomsThrooooow.h"
 #include "Kismet/KismetMathLibrary.h"
+#include "Animation/AnimInstance.h"
 #include "Item/ThrowableActor.h"
 #include "GameCharacterBase.h"
 
@@ -157,6 +158,8 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 			}
 
 			ThrowableActor->OnThrow(ThrowVector);
+
+			BroadcastThrowAnimation();
 		}
 
 		PickedActor = NULL;
@@ -180,6 +183,9 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 						// Attach to PickRoot
 						ThrowableActor->OnPick();
 						ThrowableActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+						BroadcastPickAnimation();
+
 						return;
 					}
 				}
@@ -202,11 +208,29 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 						// Attach to PickRoot
 						ThrowableActor->OnPick();
 						ThrowableActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+
+						BroadcastPickAnimation();
+						
 						return;
 					}
 				}
 			}
 		}
+	}
+}
+
+void AGameCharacterBase::BroadcastPickAnimation_Implementation()
+{
+	if (PickAnimation)
+	{
+		GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(PickAnimation, "UpperBody", 0.f, 0.f);
+	}
+}
+void AGameCharacterBase::BroadcastThrowAnimation_Implementation()
+{
+	if (ThrowAnimation)
+	{
+		GetMesh()->GetAnimInstance()->PlaySlotAnimationAsDynamicMontage(ThrowAnimation, "UpperBody", 0.f, 0.f);
 	}
 }
 

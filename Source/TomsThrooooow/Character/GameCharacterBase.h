@@ -38,10 +38,21 @@ protected:
 	
 	UPROPERTY(EditAnywhere, Category = "PickAndThrow")
 	float ThrowStrength;
+
+	UPROPERTY(EditAnywhere, Category = "PickAndThrow")
+	UAnimSequenceBase* PickAnimation;
+
+	UPROPERTY(EditAnywhere, Category = "PickAndThrow")
+	UAnimSequenceBase* ThrowAnimation;
 private:
 	UFUNCTION(Server, Reliable, WithValidation)
 	void ServerPickOrThrow(float RightInput,float UpInput);
 	void PickOrThrowWithInput(float RightInput, float UpInput);
+
+	UFUNCTION(Reliable, NetMulticast)
+	void BroadcastPickAnimation();
+	UFUNCTION(Reliable, NetMulticast)
+	void BroadcastThrowAnimation();
 
 	/** Implement IThrowableInterface start*/
 	virtual void OnPick();
@@ -55,15 +66,15 @@ public:
 	// Set the Character state to stun
 	void SetStun();
 	void SetUnstun();
+
+	UPROPERTY(BlueprintReadOnly, Category = "Stun", ReplicatedUsing = OnRep_SetStunning)
+	bool bIsStunning;
 private:
-	UPROPERTY(VisibleAnywhere, Category = "PickAndThrow")
+	UPROPERTY(VisibleAnywhere, Category = "Stun")
 	UParticleSystemComponent* StunEffect;
 
 	UFUNCTION()
 	virtual void OnRep_SetStunning();
-
-	UPROPERTY(Transient, ReplicatedUsing=OnRep_SetStunning)
-	bool bIsStunning;
 	/* Timer handle to manage stun time */
 	FTimerHandle TimerHandle_Stun;
 	/************************************************************************/
