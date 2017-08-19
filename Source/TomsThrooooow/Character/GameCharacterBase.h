@@ -34,9 +34,6 @@ protected:
 	UCapsuleComponent* PickCheckCapsule;
 
 	UPROPERTY(VisibleAnywhere, Category = "PickAndThrow")
-	UCapsuleComponent* HitCheckCapsule;
-
-	UPROPERTY(VisibleAnywhere, Category = "PickAndThrow")
 	USceneComponent* PickRoot;	
 	
 	UPROPERTY(EditAnywhere, Category = "PickAndThrow")

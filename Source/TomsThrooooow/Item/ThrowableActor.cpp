@@ -50,7 +50,7 @@ void AThrowableActor::OnCollisionHit(AActor* SelfActor, AActor* OtherActor, FVec
 		FVector SelfVelocity = GetVelocity();
 		//UE_LOG(LogTomThrow, Verbose, TEXT("SelfVelocity:(%f,%f,%f)"), SelfVelocity.X, SelfVelocity.Y, SelfVelocity.Z);
 
-		if (SelfVelocity.Size() > 200)
+		if (SelfVelocity.Size() > 200 && NormalImpulse.Size() > 100000)
 		{
 			OtherCharacter->SetStun();
 		}
