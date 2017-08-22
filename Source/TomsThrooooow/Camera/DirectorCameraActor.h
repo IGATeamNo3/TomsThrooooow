@@ -15,7 +15,7 @@ enum class EDirectorCameraMoveType : uint8
 	/** The Camera don't move ever */
 	Fix,
 	/** The Camera will adjust itself to cover all pawns */
-	AlwaysCoverAllPawns /** TODO */
+	AlwaysCoverAllLocalPawns /** TODO */
 };
 
 
@@ -25,8 +25,12 @@ class TOMSTHROOOOOW_API ADirectorCameraActor : public ACameraActor
 	GENERATED_BODY()
 public:
 	ADirectorCameraActor();
+	virtual void Tick(float DeltaSeconds) override;
 private:
 	UPROPERTY(EditAnywhere, Category = Director)
 	EDirectorCameraMoveType MoveType;
+
+	UPROPERTY(EditAnywhere, Category = Director)
+	float InterSpeed;
 };
 
