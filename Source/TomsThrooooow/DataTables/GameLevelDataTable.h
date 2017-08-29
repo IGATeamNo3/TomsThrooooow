@@ -9,20 +9,8 @@ struct FGameLevelDataTable : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	FGameLevelDataTable()
-		: BlinkCameraFadeColor(0.8f, 0.8f, 0.8f)
-	{
-
-	}
+	FGameLevelDataTable() {};
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
-	FName ActID;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
-	FText ActName;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
-	FText ActDescription;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
 	FName LevelID;
@@ -43,24 +31,16 @@ struct FGameLevelDataTable : public FTableRowBase
 	FText LevelDescription;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
-	TSubclassOf<UObject> LevelMission;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
 	TArray<FString> LevelSpecifiedExecCommands;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
-	TAssetPtr<class UFMODEvent> LevelDescriptionVoice;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
-	TAssetPtr<class UFMODEvent> ActDescriptionVoice;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
-	FLinearColor BlinkCameraFadeColor;
+	/*UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
+	FLinearColor BlinkCameraFadeColor;*/
 };
 /**
  * 
  */
-class BLACKSHIELDNETNATIVE_API GameLevelDataTable
+class TOMSTHROOOOOW_API GameLevelDataTable
 {
 public:
 	GameLevelDataTable();
