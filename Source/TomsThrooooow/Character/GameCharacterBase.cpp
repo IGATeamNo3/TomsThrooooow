@@ -159,6 +159,7 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 
 			ThrowableActor->OnThrow(ThrowVector);
 
+			bIsPicking = false;
 			BroadcastThrowAnimation();
 		}
 
@@ -184,6 +185,7 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 						ThrowableActor->OnPick();
 						ThrowableActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
+						bIsPicking = true;
 						BroadcastPickAnimation();
 
 						return;
@@ -209,6 +211,7 @@ void AGameCharacterBase::PickOrThrowWithInput(float RightInput, float UpInput)
 						ThrowableActor->OnPick();
 						ThrowableActor->AttachToComponent(PickRoot, FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 
+						bIsPicking = true;
 						BroadcastPickAnimation();
 						
 						return;

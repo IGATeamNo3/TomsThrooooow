@@ -30,6 +30,8 @@ protected:
 	UPROPERTY(Transient, Replicated)
 	bool bIsPickedByOthers;
 
+	bool bIsPicking;
+
 	UPROPERTY(VisibleAnywhere, Category = "PickAndThrow")
 	UCapsuleComponent* PickCheckCapsule;
 
