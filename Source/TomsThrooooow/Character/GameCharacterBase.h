@@ -30,6 +30,7 @@ protected:
 	UPROPERTY(Transient, Replicated)
 	bool bIsPickedByOthers;
 
+	UPROPERTY(BlueprintReadOnly, Transient, Replicated)
 	bool bIsPicking;
 
 	UPROPERTY(VisibleAnywhere, Category = "PickAndThrow")
