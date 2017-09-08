@@ -15,7 +15,7 @@ enum class EDirectorCameraMoveType : uint8
 	/** The Camera don't move ever */
 	Fix,
 	/** The Camera will adjust itself to cover all pawns */
-	AlwaysCoverAllLocalPawns /** TODO */
+	AlwaysCoverAllPawns
 };
 
 
@@ -32,5 +32,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Director)
 	float InterSpeed;
+
+	UPROPERTY(EditAnywhere, Category = Director)
+	float ClosestDistance;
 };
 
