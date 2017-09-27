@@ -35,5 +35,11 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = Director)
 	float ClosestDistance;
+
+	UPROPERTY(EditAnywhere, Category = Director)
+	float WidthExtendScale;
+
+	UPROPERTY(EditAnywhere, Category = Director)
+	float HeightExtendScale;
 };
 

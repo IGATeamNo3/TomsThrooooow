@@ -14,6 +14,8 @@ ADirectorCameraActor::ADirectorCameraActor()
 	MoveType = EDirectorCameraMoveType::Fix;
 	InterSpeed = 10.f;
 	ClosestDistance = 600.f;
+	WidthExtendScale = 1.2f;
+	HeightExtendScale = 1.2f;
 }
 
 void ADirectorCameraActor::Tick(float DeltaSeconds)
@@ -56,9 +58,8 @@ void ADirectorCameraActor::Tick(float DeltaSeconds)
 			float MaxHeight = 0;
 			for (int i = 0; i < AllGameCharacters.Num(); ++i)
 			{
-				// TODO:1.2 is magic number
-				float CurrentWidth = UKismetMathLibrary::Abs(AllGameCharacters[i]->GetActorLocation().Y - DestinationLocation.Y) * 1.2;
-				float CurrentHeight = UKismetMathLibrary::Abs(AllGameCharacters[i]->GetActorLocation().Z - DestinationLocation.Z) * 1.2;
+				float CurrentWidth = UKismetMathLibrary::Abs(AllGameCharacters[i]->GetActorLocation().Y - DestinationLocation.Y) * WidthExtendScale;
+				float CurrentHeight = UKismetMathLibrary::Abs(AllGameCharacters[i]->GetActorLocation().Z - DestinationLocation.Z) * HeightExtendScale;
 				MaxWidth = UKismetMathLibrary::FMax(MaxWidth, CurrentWidth);
 				MaxHeight = UKismetMathLibrary::FMax(MaxHeight, CurrentHeight);
 			}
